@@ -1,122 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import CoursesPage from "./pages/CoursesPage";
+import SemestersPage from "./pages/SemestersPage";
+import SubjectsPage from "./pages/SubjectsPage";
+import SubjectResourcesPage from "./pages/SubjectResourcesPage";
+import AssignmentsPage from "./pages/AssignmentsPage";
+import NotesPage from "./pages/NotesPage";
+import VideosPage from "./pages/VideosPage";
+import ProfilePage from "./pages/ProfilePage";
+import CommunityPage from "./pages/CommunityPage";
+import SchedulePage from "./pages/SchedulePage";
+import CertificatesPage from "./pages/CertificatesPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import StudentLayout from "./components/StudentLayout";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <style>{`
+        body, html, #root {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          min-height: 100%;
+          background-color: #f8fafc;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+        }
 
-      <div className="ticks"></div>
+        * {
+          box-sizing: border-box;
+        }
+      `}</style>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <BrowserRouter>
+        <Routes>
+          {/* PUBLIC */}
+          <Route path="/" element={<LoginPage />} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+          {/* PROTECTED + SHARED LAYOUT */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <StudentLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/semesters/:courseId" element={<SemestersPage />} />
+            <Route path="/subjects/:semesterId" element={<SubjectsPage />} />
+            <Route path="/resources/:subjectId" element={<SubjectResourcesPage />} />
+            <Route path="/assignments" element={<AssignmentsPage />} />
+            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/videos" element={<VideosPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/schedule" element={<SchedulePage />} />
+            <Route path="/certificates" element={<CertificatesPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Routes>
+
+        <footer style={globalFooterStyle}>
+          Made with <span style={{ color: "#ef4444", margin: "0 4px" }}>❤️</span> by Neeraj Singh Baghel
+        </footer>
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+const globalFooterStyle = {
+  position: "fixed",
+  bottom: "16px",
+  left: "50%",
+  transform: "translateX(-50%)",
+  fontSize: "12px",
+  color: "#475569",
+  fontWeight: "500",
+  textAlign: "center",
+  zIndex: 9999,
+  backgroundColor: "rgba(15, 23, 42, 0.6)",
+  padding: "6px 16px",
+  borderRadius: "20px",
+  backdropFilter: "blur(8px)",
+  WebkitBackdropFilter: "blur(8px)",
+  border: "1px solid rgba(255, 255, 255, 0.03)",
+  pointerEvents: "none"
+};
+
+export default App;

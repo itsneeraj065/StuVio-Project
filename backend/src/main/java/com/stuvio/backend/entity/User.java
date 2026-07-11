@@ -1,42 +1,31 @@
 package com.stuvio.backend.entity;
 
-import com.stuvio.backend.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-//import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-//import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-//@NoArgsConstructor
-//@AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "users")
 public class User {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 
-	@Column(nullable = false, length = 50)
-	private String firstName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false, length = 50)
-	private String lastName;
+    private String firstName;
+    private String lastName;
 
-	@Column(nullable = false, unique = true)
-	private String email;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-	@Column(nullable = false)
-	private String password;
+    @JsonIgnore
+    private String password;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private UserRole role;
-
-	@Column
-	private String profileImage;
+    private String profileImage;
+    private String role;
 }
