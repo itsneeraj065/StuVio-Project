@@ -116,21 +116,25 @@ function LandingPage() {
       {/* FOOTER */}
 <footer style={styles.footer}>
   <div style={styles.footerRow}>
+    {/* Left side stays as requested */}
     <div>© {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.</div>
     
+    {/* Right side now includes both Links and Social Icons */}
     <div style={styles.footerLinks}>
       <a href="#features" style={styles.footerLink}>Features</a>
       
-      {/* ADD SOCIAL ICONS HERE */}
-      <a href="https://github.com/yourusername" target="_blank" rel="noreferrer" style={styles.socialIcon}>
-        <FaGithub />
-      </a>
-      <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noreferrer" style={styles.socialIcon}>
-        <FaLinkedin />
-      </a>
-      <a href="https://instagram.com/yourhandle" target="_blank" rel="noreferrer" style={styles.socialIcon}>
-        <FaInstagram />
-      </a>
+      {/* SOCIAL MEDIA ICONS */}
+      <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+        <a href="https://github.com/your-profile" target="_blank" rel="noreferrer" style={styles.socialLink}>
+          <FaGithub />
+        </a>
+        <a href="https://linkedin.com/in/your-profile" target="_blank" rel="noreferrer" style={styles.socialLink}>
+          <FaLinkedin />
+        </a>
+        <a href="https://instagram.com/your-handle" target="_blank" rel="noreferrer" style={styles.socialLink}>
+          <FaInstagram />
+        </a>
+      </div>
     </div>
   </div>
 </footer>
@@ -369,14 +373,13 @@ const styles = {
     transition: "color 0.2s"
   } , 
   // Add this inside your styles object:
-socialIcon: {
-  color: "#64748b",
-  fontSize: "18px",
-  textDecoration: "none",
-  display: "flex",
-  alignItems: "center",
-  transition: "color 0.2s"
-},
+socialLink: {
+    color: "#64748b",
+    fontSize: "18px",
+    display: "flex",
+    alignItems: "center",
+    transition: "color 0.2s"
+  },
 
 // You might also want to add a hover effect if you wish:
 // (Or just keep it as is, and the icons will match your existing color scheme)
