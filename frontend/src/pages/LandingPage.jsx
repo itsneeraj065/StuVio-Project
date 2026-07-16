@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -113,15 +114,26 @@ function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer style={styles.footer}>
-        <div style={styles.footerRow}>
-          <div>© {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.</div>
-          <div style={styles.footerLinks}>
-            <a href="#features" style={styles.footerLink}>Features</a>
-            <a href="https://github.com" target="_blank" rel="noreferrer" style={styles.footerLink}>GitHub</a>
-          </div>
-        </div>
-      </footer>
+<footer style={styles.footer}>
+  <div style={styles.footerRow}>
+    <div>© {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.</div>
+    
+    <div style={styles.footerLinks}>
+      <a href="#features" style={styles.footerLink}>Features</a>
+      
+      {/* ADD SOCIAL ICONS HERE */}
+      <a href="https://github.com/yourusername" target="_blank" rel="noreferrer" style={styles.socialIcon}>
+        <FaGithub />
+      </a>
+      <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noreferrer" style={styles.socialIcon}>
+        <FaLinkedin />
+      </a>
+      <a href="https://instagram.com/yourhandle" target="_blank" rel="noreferrer" style={styles.socialIcon}>
+        <FaInstagram />
+      </a>
+    </div>
+  </div>
+</footer>
 
     </div>
   );
@@ -355,7 +367,19 @@ const styles = {
     color: "#64748b",
     textDecoration: "none",
     transition: "color 0.2s"
-  }
+  } , 
+  // Add this inside your styles object:
+socialIcon: {
+  color: "#64748b",
+  fontSize: "18px",
+  textDecoration: "none",
+  display: "flex",
+  alignItems: "center",
+  transition: "color 0.2s"
+},
+
+// You might also want to add a hover effect if you wish:
+// (Or just keep it as is, and the icons will match your existing color scheme)
 };
 
 export default LandingPage;
