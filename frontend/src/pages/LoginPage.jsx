@@ -28,7 +28,6 @@ function LoginPage() {
 
   return (
     <div style={styles.container}>
-      {/* Main Login Card */}
       <div style={styles.card}>
         <div style={styles.header}>
           <img 
@@ -72,12 +71,21 @@ function LoginPage() {
           </button>
         </form>
 
+        {/* UPDATED: Added Auth Navigation Options */}
+        <div style={styles.authOptions}>
+          <span style={styles.link} onClick={() => navigate("/forgot-password")}>Forgot Password?</span>
+          <div style={styles.userActions}>
+            <span style={styles.link} onClick={() => navigate("/register")}>New User</span>
+            <span style={styles.divider}>|</span>
+            <span style={styles.link} onClick={() => navigate("/login")}>Existing User</span>
+          </div>
+        </div>
+
         <p style={styles.backHome} onClick={() => navigate("/")}>
           ← Back to Public System Interface
         </p>
       </div>
 
-      {/* Fixed Footer */}
       <footer style={styles.footer}>
         © {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.
       </footer>
@@ -88,9 +96,9 @@ function LoginPage() {
 const styles = {
   container: {
     backgroundColor: "#0b0f19",
-    minHeight: "100vh", // Changed from height to minHeight
+    minHeight: "100vh",
     display: "flex",
-    flexDirection: "column", // Enables column layout
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     padding: "20px"
@@ -104,16 +112,32 @@ const styles = {
     padding: "40px",
     boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)",
     backdropFilter: "blur(10px)",
-    marginTop: "auto", // Pushes card to center
-    marginBottom: "auto" // Pushes card to center
+    marginTop: "auto",
+    marginBottom: "auto"
   },
-  footer: {
-    padding: "20px",
-    color: "#475569",
-    fontSize: "12px",
-    textAlign: "center",
-    width: "100%"
+  // New Styles
+  authOptions: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+    marginTop: "20px"
   },
+  userActions: {
+    display: "flex",
+    gap: "10px",
+    fontSize: "13px"
+  },
+  link: {
+    color: "#6366f1",
+    cursor: "pointer",
+    fontSize: "13px",
+    fontWeight: "500",
+    textDecoration: "underline"
+  },
+  divider: { color: "#475569" },
+  // Existing Styles
+  footer: { padding: "20px", color: "#475569", fontSize: "12px", textAlign: "center", width: "100%" },
   header: { textAlign: "center", marginBottom: "32px" },
   logoImg: { height: "80px", width: "auto", cursor: "pointer", marginBottom: "8px" },
   subtitle: { fontSize: "14px", color: "#64748b", fontWeight: "500" },
@@ -129,40 +153,10 @@ const styles = {
   },
   form: { display: "flex", flexDirection: "column", gap: "20px" },
   inputGroup: { display: "flex", flexDirection: "column", gap: "6px" },
-  label: {
-    fontSize: "12px",
-    fontWeight: "600",
-    color: "#94a3b8",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px"
-  },
-  input: {
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "10px",
-    color: "#ffffff",
-    padding: "12px 16px",
-    fontSize: "14px",
-    outline: "none"
-  },
-  submitBtn: {
-    backgroundColor: "#6366f1",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "10px",
-    padding: "14px",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    marginTop: "10px"
-  },
-  backHome: {
-    fontSize: "13px",
-    color: "#64748b",
-    textAlign: "center",
-    marginTop: "24px",
-    cursor: "pointer"
-  }
+  label: { fontSize: "12px", fontWeight: "600", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px" },
+  input: { backgroundColor: "rgba(15, 23, 42, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#ffffff", padding: "12px 16px", fontSize: "14px", outline: "none" },
+  submitBtn: { backgroundColor: "#6366f1", color: "#ffffff", border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: "600", cursor: "pointer", marginTop: "10px" },
+  backHome: { fontSize: "13px", color: "#64748b", textAlign: "center", marginTop: "24px", cursor: "pointer" }
 };
 
 export default LoginPage;
