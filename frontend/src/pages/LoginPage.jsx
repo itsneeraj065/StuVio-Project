@@ -106,7 +106,7 @@ const styles = {
   },
   // UPDATED: Added style for the logo image
   logoImg: {
-    height: "60px",
+    height: "80px",
     width: "auto",
     cursor: "pointer",
     marginBottom: "8px"

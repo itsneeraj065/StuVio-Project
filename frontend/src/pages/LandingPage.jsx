@@ -31,7 +31,7 @@ function LandingPage() {
       {/* PUBLIC HEADER NAVBAR */}
 <header style={styles.navbar}>
   <div style={styles.logo}>
-    <img src="/logo.png" alt="StuVio Logo" style={{ height: "40px", width: "auto" }} />
+    <img src="/logo.png" alt="StuVio Logo" style={{ height: "80px", width: "auto" }} />
   </div>
   <nav style={styles.navLinks}>
     <a href="#features" style={styles.navLink}>Features</a>
