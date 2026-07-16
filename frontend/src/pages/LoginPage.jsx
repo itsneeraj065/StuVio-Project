@@ -28,9 +28,9 @@ function LoginPage() {
 
   return (
     <div style={styles.container}>
+      {/* Main Login Card */}
       <div style={styles.card}>
         <div style={styles.header}>
-          {/* UPDATED: Replaced h2 with logo image */}
           <img 
             src="/logo.png" 
             alt="StuVio Logo" 
@@ -76,16 +76,21 @@ function LoginPage() {
           ← Back to Public System Interface
         </p>
       </div>
+
+      {/* Fixed Footer */}
+      <footer style={styles.footer}>
+        © {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.
+      </footer>
     </div>
   );
 }
 
 const styles = {
-  // ... (keeping your existing container, card, etc., styles)
   container: {
     backgroundColor: "#0b0f19",
-    height: "100vh",
+    minHeight: "100vh", // Changed from height to minHeight
     display: "flex",
+    flexDirection: "column", // Enables column layout
     alignItems: "center",
     justifyContent: "center",
     padding: "20px"
@@ -98,24 +103,20 @@ const styles = {
     maxWidth: "420px",
     padding: "40px",
     boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)",
-    backdropFilter: "blur(10px)"
+    backdropFilter: "blur(10px)",
+    marginTop: "auto", // Pushes card to center
+    marginBottom: "auto" // Pushes card to center
   },
-  header: {
+  footer: {
+    padding: "20px",
+    color: "#475569",
+    fontSize: "12px",
     textAlign: "center",
-    marginBottom: "32px"
+    width: "100%"
   },
-  // UPDATED: Added style for the logo image
-  logoImg: {
-    height: "80px",
-    width: "auto",
-    cursor: "pointer",
-    marginBottom: "8px"
-  },
-  subtitle: {
-    fontSize: "14px",
-    color: "#64748b",
-    fontWeight: "500"
-  },
+  header: { textAlign: "center", marginBottom: "32px" },
+  logoImg: { height: "80px", width: "auto", cursor: "pointer", marginBottom: "8px" },
+  subtitle: { fontSize: "14px", color: "#64748b", fontWeight: "500" },
   errorBox: {
     backgroundColor: "rgba(239, 68, 68, 0.1)",
     border: "1px solid rgba(239, 68, 68, 0.2)",
@@ -126,16 +127,8 @@ const styles = {
     marginBottom: "20px",
     textAlign: "center"
   },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px"
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px"
-  },
+  form: { display: "flex", flexDirection: "column", gap: "20px" },
+  inputGroup: { display: "flex", flexDirection: "column", gap: "6px" },
   label: {
     fontSize: "12px",
     fontWeight: "600",
@@ -150,8 +143,7 @@ const styles = {
     color: "#ffffff",
     padding: "12px 16px",
     fontSize: "14px",
-    outline: "none",
-    transition: "border-color 0.2s"
+    outline: "none"
   },
   submitBtn: {
     backgroundColor: "#6366f1",
@@ -162,7 +154,6 @@ const styles = {
     fontSize: "14px",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "background 0.2s",
     marginTop: "10px"
   },
   backHome: {
@@ -170,8 +161,7 @@ const styles = {
     color: "#64748b",
     textAlign: "center",
     marginTop: "24px",
-    cursor: "pointer",
-    transition: "color 0.2s"
+    cursor: "pointer"
   }
 };
 
