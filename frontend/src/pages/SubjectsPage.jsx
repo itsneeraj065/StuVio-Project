@@ -1,144 +1,292 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import API from "../api/api";
+import { useState } from "react";
 
 function SubjectsPage() {
-  const navigate = useNavigate();
-  const { semesterId } = useParams();
+  const [selectedSubject, setSelectedSubject] = useState("CS-402");
 
-  const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [isLogoutHovered, setIsLogoutHovered] = useState(false);
-  const [hoveredCardId, setHoveredCardId] = useState(null);
-
-  useEffect(() => {
-    fetchSubjects();
-  }, []);
-
-  const fetchSubjects = async () => {
-    try {
-      setError("");
-      const response = await API.get(`/subjects/semester/${semesterId}`);
-      setSubjects(response.data);
-    } catch (error) {
-      console.error("Error fetching subjects:", error);
-      setError("Failed to load subjects. Please check your network connection.");
-    } finally {
-      setLoading(false);
+  const subjectsData = [
+    {
+      code: "CS-402",
+      name: "Advanced Operating Systems",
+      credits: 4,
+      status: "Active",
+      units: [
+        { title: "Unit 1: Process Synchronization & Semaphores", status: "Completed", progress: 100 },
+        { title: "Unit 2: Distributed Deadlock Detection", status: "Completed", progress: 100 },
+        { title: "Unit 3: Multiprocessor & Real-Time Scheduling", status: "Ongoing", progress: 60 },
+        { title: "Unit 4: Distributed Shared Memory", status: "Locked", progress: 0 },
+        { title: "Unit 5: Failure Recovery & Fault Tolerance", status: "Locked", progress: 0 }
+      ]
+    },
+    {
+      code: "CS-406",
+      name: "Design & Analysis of Algorithms",
+      credits: 4,
+      status: "Active",
+      units: [
+        { title: "Unit 1: Growth of Functions & Recurrence Relations", status: "Completed", progress: 100 },
+        { title: "Unit 2: Divide & Conquer and Greedy Paradigms", status: "Completed", progress: 100 },
+        { title: "Unit 3: Dynamic Programming (LCS, Knapsack)", status: "Ongoing", progress: 40 },
+        { title: "Unit 4: Graph Algorithms (Dijkstra, MST)", status: "Locked", progress: 0 },
+        { title: "Unit 5: NP-Completeness & Approximation", status: "Locked", progress: 0 }
+      ]
+    },
+    {
+      code: "CS-408",
+      name: "Network Security & Cryptography",
+      credits: 3,
+      status: "Active",
+      units: [
+        { title: "Unit 1: Classical Encryption Techniques", status: "Completed", progress: 100 },
+        { title: "Unit 2: Symmetric Block Ciphers (DES, AES)", status: "Completed", progress: 100 },
+        { title: "Unit 3: Asymmetric Cryptography (RSA, ECC)", status: "Ongoing", progress: 10 },
+        { title: "Unit 4: Hash Functions & Digital Signatures", status: "Locked", progress: 0 },
+        { title: "Unit 5: System Security (IPSec, Firewalls)", status: "Locked", progress: 0 }
+      ]
     }
-  };
+  ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
+  const activeSubject = subjectsData.find(s => s.code === selectedSubject);
 
   return (
-    <div style={styles.dashboardContainer}>
-      
+    <div style={styles.canvas}>
+      <div style={styles.header}>
+        <h2 style={styles.heading}>Course Subjects Matrix</h2>
+        <p style={styles.subheading}>Deconstruct academic subjects into core syllabus blocks, check milestone goals, and inspect laboratory items.</p>
+      </div>
 
-      {/* MAIN CONTENT WORKSPACE */}
-      <main style={styles.mainContent}>
-        <header style={styles.contentHeader}>
-          <div>
-            <div style={styles.breadcrumbWrapper}>
-              <span style={styles.breadcrumb} onClick={() => navigate("/courses")}>Courses</span>
-              <span style={styles.breadcrumbSeparator}>/</span>
-              <span style={styles.breadcrumb} onClick={() => navigate(-1)}>Semesters</span>
-              <span style={styles.breadcrumbSeparator}>/</span>
-              <span style={styles.breadcrumbActive}>Subjects</span>
-            </div>
-            <h1 style={styles.pageTitle}>Semester Subjects</h1>
-            <p style={styles.pageSubtitle}>Select a structural course subject to access dynamic online reference files.</p>
+      <div style={styles.splitLayout}>
+        {/* Subject Selector Sidebar (Inside Content Area) */}
+        <div style={styles.subjectListColumn}>
+          <h3 style={styles.columnTitle}>Core Catalog</h3>
+          <div style={styles.subStack}>
+            {subjectsData.map((sub) => {
+              const isSelected = sub.code === selectedSubject;
+              return (
+                <div
+                  key={sub.code}
+                  onClick={() => setSelectedSubject(sub.code)}
+                  style={{
+                    ...styles.subSelectorCard,
+                    backgroundColor: isSelected ? "rgba(99, 102, 241, 0.12)" : "rgba(15, 23, 42, 0.2)",
+                    borderColor: isSelected ? "#6366f1" : "rgba(255, 255, 255, 0.04)"
+                  }}
+                >
+                  <span style={styles.codeBadge}>{sub.code}</span>
+                  <div style={{ ...styles.subTitleText, color: isSelected ? "#ffffff" : "#cbd5e1" }}>
+                    {sub.name}
+                  </div>
+                  <div style={styles.creditsLabel}>{sub.credits} Academic Credits</div>
+                </div>
+              );
+            })}
           </div>
-        </header>
+        </div>
 
-        {error && <div style={styles.errorBanner}>{error}</div>}
+        {/* Selected Subject Units Inspector */}
+        <div style={styles.syllabusInspectorColumn}>
+          <div style={styles.inspectorHeader}>
+            <div>
+              <span style={styles.instructorTag}>Course Breakdown</span>
+              <h3 style={styles.inspectorTitle}>{activeSubject.name}</h3>
+            </div>
+          </div>
 
-        {loading ? (
-          <div style={styles.grid}>
-            {[1, 2, 3].map((n) => (
-              <div key={n} style={styles.skeletonCard}>
-                <div style={styles.skeletonTitle}></div>
-                <div style={styles.skeletonText}></div>
+          <div style={styles.unitList}>
+            {activeSubject.units.map((unit, index) => (
+              <div key={index} style={styles.unitCard}>
+                <div style={styles.unitHeaderRow}>
+                  <span style={styles.unitTitleText}>{unit.title}</span>
+                  <span style={{
+                    ...styles.statusBadge,
+                    color: unit.status === "Completed" ? "#10b981" : unit.status === "Ongoing" ? "#38bdf8" : "#64748b",
+                    backgroundColor: unit.status === "Completed" ? "rgba(16, 185, 129, 0.1)" : unit.status === "Ongoing" ? "rgba(56, 189, 248, 0.1)" : "rgba(255, 255, 255, 0.02)"
+                  }}>
+                    {unit.status}
+                  </span>
+                </div>
+
+                {unit.progress > 0 && (
+                  <div style={styles.progressRow}>
+                    <div style={styles.progressBarTrack}>
+                      <div style={{ ...styles.progressBarFill, width: `${unit.progress}%` }} />
+                    </div>
+                    <span style={styles.percentageText}>{unit.progress}% Ready</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
-        ) : (
-          <div style={styles.grid}>
-            {subjects.length === 0 && !error ? (
-              <p style={styles.emptyStateText}>No active subject entries map to this specific structural term.</p>
-            ) : (
-              subjects.map((subject) => (
-                <div
-                  key={subject.id}
-                  onClick={() => navigate(`/resources/${subject.id}`)}
-                  onMouseEnter={() => setHoveredCardId(subject.id)}
-                  onMouseLeave={() => setHoveredCardId(null)}
-                  style={{...styles.card, ...(hoveredCardId === subject.id ? styles.cardHover : {})}}
-                >
-                  <div style={styles.cardHeader}>
-                    <div style={styles.subjectBadge}>📖 Subject</div>
-                    <span style={{...styles.arrowIcon, ...(hoveredCardId === subject.id ? styles.arrowIconHover : {})}}>→</span>
-                  </div>
-                  <h2 style={styles.subjectTitle}>{subject.subjectName}</h2>
-<p style={styles.subjectCode}>{subject.subjectCode || "No Code Listed"}</p>
-<p style={{ marginTop: "8px", fontSize: "13px", color: "#64748b" }}>
-  {subject.description || "No description available"}
-</p>
-<p style={{ marginTop: "6px", fontSize: "13px", fontWeight: "600", color: "#334155" }}>
-  Credits: {subject.credits}
-</p>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
 
-// Styling definitions shared with other dashboard page components
-const commonStyles = {
-  dashboardContainer: { display: "flex", height: "100vh", width: "100vw", backgroundColor: "#f8fafc", fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', overflow: "hidden" },
-  sidebar: { width: "260px", backgroundColor: "#ffffff", borderRight: "1px solid #e2e8f0", padding: "24px 16px", display: "flex", flexDirection: "column", boxSizing: "border-box" },
-  brandWrapper: { display: "flex", alignItems: "center", gap: "10px", paddingLeft: "8px", marginBottom: "32px" },
-  logo: { height: "36px", width: "36px", objectFit: "cover", borderRadius: "50%" },
-  brandName: { fontSize: "20px", fontWeight: "800", color: "#1e293b", letterSpacing: "-0.5px" },
-  navMenu: { display: "flex", flexDirection: "column", gap: "8px", flexGrow: 1 },
-  navItem: { display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", color: "#64748b", cursor: "pointer", transition: "all 0.2s ease" },
-  navItemActive: { backgroundColor: "#f1f5f9", color: "#2563eb" },
-  navIcon: { color: "inherit" },
-  logoutButton: { display: "flex", alignItems: "center", justifycenter: "center", gap: "10px", padding: "12px", backgroundColor: "#fef2f2", color: "#dc2626", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: "600", cursor: "pointer", transition: "all 0.2s ease" },
-  logoutButtonHover: { backgroundColor: "#fee2e2", transform: "translateY(-1px)" },
-  mainContent: { flexGrow: 1, padding: "40px", overflowY: "auto", boxSizing: "border-box" },
-  contentHeader: { marginBottom: "32px" },
-  breadcrumbWrapper: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px", fontSize: "13px", fontWeight: "600" },
-  breadcrumb: { color: "#2563eb", cursor: "pointer" },
-  breadcrumbSeparator: { color: "#94a3b8" },
-  breadcrumbActive: { color: "#64748b" },
-  pageTitle: { fontSize: "28px", fontWeight: "800", color: "#1e293b", margin: "0 0 6px 0" },
-  pageSubtitle: { fontSize: "14px", color: "#64748b", margin: 0 },
-  errorBanner: { backgroundColor: "#fef2f2", color: "#dc2626", padding: "14px", borderRadius: "10px", fontSize: "14px", marginBottom: "24px", border: "1px solid #fee2e2", fontWeight: "500" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px" },
-  emptyStateText: { color: "#64748b", fontSize: "14px" }
-};
-
 const styles = {
-  ...commonStyles,
-  card: { background: "#ffffff", padding: "24px", borderRadius: "14px", border: "1px solid #e2e8f0", cursor: "pointer", transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.02)", display: "flex", flexDirection: "column", minHeight: "140px" },
-  cardHover: { transform: "translateY(-4px)", borderColor: "#2563eb", boxShadow: "0 12px 20px -8px rgba(37, 99, 235, 0.15)" },
-  cardHeader: { display: "flex", justifycontent: "space-between", alignItems: "center", marginBottom: "16px" },
-  subjectBadge: { backgroundColor: "#f1f5f9", color: "#475569", padding: "4px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: "600" },
-  arrowIcon: { fontSize: "18px", color: "#94a3b8", transition: "all 0.2s ease" },
-  arrowIconHover: { color: "#2563eb", transform: "translateX(3px)" },
-  subjectTitle: { fontSize: "18px", fontWeight: "700", color: "#1e293b", margin: "0 0 6px 0", lineHeight: "1.4" },
-  subjectCode: { margin: 0, fontSize: "13px", color: "#64748b", fontWeight: "500" },
-  skeletonCard: { background: "#ffffff", padding: "24px", borderRadius: "14px", border: "1px solid #f1f5f9", minHeight: "140px" },
-  skeletonTitle: { height: "22px", width: "70%", backgroundColor: "#f1f5f9", borderRadius: "6px", marginBottom: "16px" },
-  skeletonText: { height: "16px", width: "40%", backgroundColor: "#f1f5f9", borderRadius: "6px" }
+  canvas: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "32px",
+    width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#0b0f19",
+    padding: "40px",
+    borderRadius: "24px"
+  },
+  header: {
+    marginBottom: "8px"
+  },
+  heading: {
+    fontSize: "28px",
+    fontWeight: "800",
+    margin: "0 0 6px 0",
+    letterSpacing: "-0.5px",
+    background: "linear-gradient(to right, #ffffff, #cbd5e1)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
+  },
+  subheading: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#94a3b8"
+  },
+  splitLayout: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1.6fr",
+    gap: "28px",
+    alignItems: "start",
+    "@media(max-width: 900px)": {
+      gridTemplateColumns: "1fr"
+    }
+  },
+  subjectListColumn: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
+    padding: "24px"
+  },
+  columnTitle: {
+    fontSize: "18px",
+    fontWeight: "700",
+    color: "#ffffff",
+    marginBottom: "20px"
+  },
+  subStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px"
+  },
+  subSelectorCard: {
+    border: "1px solid",
+    borderRadius: "14px",
+    padding: "18px",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px"
+  },
+  codeBadge: {
+    fontSize: "10px",
+    fontWeight: "700",
+    color: "#818cf8",
+    backgroundColor: "rgba(99, 102, 241, 0.12)",
+    padding: "3px 8px",
+    borderRadius: "5px",
+    alignSelf: "flex-start"
+  },
+  subTitleText: {
+    fontSize: "14px",
+    fontWeight: "700",
+    lineHeight: "1.4"
+  },
+  creditsLabel: {
+    fontSize: "11px",
+    color: "#475569",
+    fontWeight: "600"
+  },
+  syllabusInspectorColumn: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
+    padding: "28px"
+  },
+  inspectorHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+    paddingBottom: "20px",
+    marginBottom: "24px"
+  },
+  instructorTag: {
+    fontSize: "11px",
+    color: "#818cf8",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px"
+  },
+  inspectorTitle: {
+    fontSize: "20px",
+    fontWeight: "800",
+    color: "#ffffff",
+    marginTop: "6px"
+  },
+  unitList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px"
+  },
+  unitCard: {
+    backgroundColor: "rgba(15, 23, 42, 0.3)",
+    border: "1px solid rgba(255, 255, 255, 0.02)",
+    borderRadius: "14px",
+    padding: "18px"
+  },
+  unitHeaderRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "16px"
+  },
+  unitTitleText: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#cbd5e1"
+  },
+  statusBadge: {
+    fontSize: "10px",
+    fontWeight: "700",
+    padding: "4px 10px",
+    borderRadius: "6px",
+    whiteSpace: "nowrap"
+  },
+  progressRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginTop: "14px"
+  },
+  progressBarTrack: {
+    flex: 1,
+    height: "5px",
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: "3px",
+    overflow: "hidden"
+  },
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#6366f1",
+    borderRadius: "3px"
+  },
+  percentageText: {
+    fontSize: "11px",
+    color: "#94a3b8",
+    fontWeight: "600",
+    minWidth: "50px",
+    textAlign: "right"
+  }
 };
 
 export default SubjectsPage;

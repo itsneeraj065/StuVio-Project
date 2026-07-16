@@ -1,297 +1,350 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useApp } from "../context/AppContext";
 
 function AssignmentsPage() {
-  const navigate = useNavigate();
-  const [isLogoutHovered, setIsLogoutHovered] = useState(false);
+  const { globalTasks, setGlobalTasks } = useApp();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newCourse, setNewCourse] = useState("CS-402");
+  const [newDeadline, setNewDeadline] = useState("");
 
-  // Dummy assignments for now
-  const assignments = [
-    {
-      id: 1,
-      title: "Java OOP Assignment",
-      subject: "Core Java",
-      dueDate: "2026-07-10",
-      description: "Complete OOP concepts questions and submit PDF."
-    },
-    {
-      id: 2,
-      title: "DBMS ER Diagram Task",
-      subject: "Database Management System",
-      dueDate: "2026-07-12",
-      description: "Design ER diagram for Student Management System."
-    },
-    {
-      id: 3,
-      title: "Operating System Notes Submission",
-      subject: "Operating System",
-      dueDate: "2026-07-15",
-      description: "Prepare short notes on process scheduling algorithms."
-    }
-  ];
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  // Move tasks between status gates
+  const moveTask = (taskId, nextStatus) => {
+    setGlobalTasks(globalTasks.map(task => {
+      if (task.id === taskId) {
+        return { ...task, status: nextStatus };
+      }
+      return task;
+    }));
   };
 
+  // Add a new task to the system
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+
+    const newTask = {
+      id: Date.now(),
+      title: newTitle,
+      course: newCourse,
+      deadline: newDeadline || "No deadline set",
+      daysLeft: 5, // Simulated default priority
+      status: "Pending"
+    };
+
+    setGlobalTasks([...globalTasks, newTask]);
+    setNewTitle("");
+    setNewDeadline("");
+    setShowAddForm(false);
+  };
+
+  const categories = ["Pending", "In Progress", "Completed"];
+
   return (
-    <div style={styles.dashboardContainer}>
+    <div style={styles.canvas}>
+      <div style={styles.headerRow}>
+        <div>
+          <h2 style={styles.heading}>Task & Assignments Terminal</h2>
+          <p style={styles.subheading}>Deconstruct project sprints, monitor due milestones, and progress deliverables.</p>
+        </div>
+        <button 
+          onClick={() => setShowAddForm(!showAddForm)} 
+          style={styles.addBtn}
+        >
+          {showAddForm ? "Cancel Creation" : "+ Register New Task"}
+        </button>
+      </div>
 
-
-      {/* MAIN CONTENT */}
-      <main style={styles.mainContent}>
-        <header style={styles.contentHeader}>
-          <div style={styles.breadcrumbWrapper}>
-            <span style={styles.breadcrumb} onClick={() => navigate("/dashboard")}>
-              Dashboard
-            </span>
-            <span style={styles.breadcrumbSeparator}>/</span>
-            <span style={styles.breadcrumbActive}>Assignments</span>
+      {/* Task Creation Form Overlay */}
+      {showAddForm && (
+        <form onSubmit={handleAddTask} style={styles.formContainer}>
+          <h4 style={styles.formTitle}>New Project / Homework Parameters</h4>
+          <div style={styles.formGrid}>
+            <input 
+              type="text" 
+              placeholder="Task name (e.g., Lab 4 Implementation)" 
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              style={styles.input}
+              required
+            />
+            <select 
+              value={newCourse} 
+              onChange={(e) => setNewCourse(e.target.value)} 
+              style={styles.select}
+            >
+              <option value="Advanced Operating Systems">Advanced Operating Systems</option>
+              <option value="Design & Analysis of Algorithms">Design & Analysis of Algorithms</option>
+              <option value="Network Security & Cryptography">Network Security & Cryptography</option>
+            </select>
+            <input 
+              type="text" 
+              placeholder="Deadline (e.g., Tomorrow, 11:59 PM)" 
+              value={newDeadline}
+              onChange={(e) => setNewDeadline(e.target.value)}
+              style={styles.input}
+            />
+            <button type="submit" style={styles.submitBtn}>Inject into Pipeline</button>
           </div>
+        </form>
+      )}
 
-          <h1 style={styles.pageTitle}>Assignments</h1>
-          <p style={styles.pageSubtitle}>
-            View all assignments across your subjects.
-          </p>
-        </header>
-
-        <div style={styles.assignmentGrid}>
-          {assignments.map((assignment) => (
-            <div key={assignment.id} style={styles.assignmentCard}>
-              <div style={styles.assignmentTop}>
-                <div style={styles.assignmentIcon}>📝</div>
-                <div>
-                  <h3 style={styles.assignmentTitle}>{assignment.title}</h3>
-                  <p style={styles.assignmentSubject}>{assignment.subject}</p>
-                </div>
+      {/* Kanban Columns Layout */}
+      <div style={styles.board}>
+        {categories.map((status) => {
+          const statusTasks = globalTasks.filter(t => t.status === status || (status === "In Progress" && t.status === "Ongoing"));
+          return (
+            <div key={status} style={styles.column}>
+              <div style={styles.columnHeader}>
+                <h3 style={styles.columnTitle}>{status}</h3>
+                <span style={styles.countBadge}>{statusTasks.length}</span>
               </div>
 
-              <p style={styles.assignmentDescription}>{assignment.description}</p>
+              <div style={styles.taskStack}>
+                {statusTasks.map((task) => (
+                  <div key={task.id} style={styles.taskCard}>
+                    <div style={styles.taskHeader}>
+                      <span style={styles.courseTag}>{task.course}</span>
+                      <span style={styles.deadlineTag}>{task.deadline}</span>
+                    </div>
+                    <h4 style={styles.taskTitle}>{task.title}</h4>
+                    
+                    {/* Directional pipeline moving buttons */}
+                    <div style={styles.actionRow}>
+                      {status !== "Pending" && (
+                        <button 
+                          onClick={() => moveTask(task.id, status === "Completed" ? "In Progress" : "Pending")}
+                          style={styles.actionBtn}
+                        >
+                          ◀ Back
+                        </button>
+                      )}
+                      <div style={{ flexGrow: 1 }} />
+                      {status !== "Completed" && (
+                        <button 
+                          onClick={() => moveTask(task.id, status === "Pending" ? "In Progress" : "Completed")}
+                          style={{...styles.actionBtn, backgroundColor: "rgba(99, 102, 241, 0.1)", color: "#818cf8"}}
+                        >
+                          Advance ▶
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
 
-              <div style={styles.assignmentFooter}>
-                <span style={styles.dueDate}>Due: {assignment.dueDate}</span>
-                <button style={styles.viewButton}>View</button>
+                {statusTasks.length === 0 && (
+                  <div style={styles.emptyColumnState}>No active sprints here</div>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      </main>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 const styles = {
-  dashboardContainer: {
-    display: "flex",
-    height: "100vh",
-    width: "100vw",
-    backgroundColor: "#f8fafc",
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    overflow: "hidden"
-  },
-
-  sidebar: {
-    width: "260px",
-    backgroundColor: "#ffffff",
-    borderRight: "1px solid #e2e8f0",
-    padding: "24px 16px",
+  canvas: {
     display: "flex",
     flexDirection: "column",
-    boxSizing: "border-box"
-  },
-
-  brandWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    paddingLeft: "8px",
-    marginBottom: "32px"
-  },
-
-  logo: {
-    height: "36px",
-    width: "36px",
-    objectFit: "cover",
-    borderRadius: "50%"
-  },
-
-  brandName: {
-    fontSize: "20px",
-    fontWeight: "800",
-    color: "#1e293b",
-    letterSpacing: "-0.5px"
-  },
-
-  navMenu: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    flexGrow: 1
-  },
-
-  navItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px 14px",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "#64748b",
-    cursor: "pointer",
-    transition: "all 0.2s ease"
-  },
-
-  navItemActive: {
-    backgroundColor: "#eff6ff",
-    color: "#2563eb"
-  },
-
-  navIcon: {
-    color: "inherit"
-  },
-
-  logoutButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    padding: "12px",
-    backgroundColor: "#fef2f2",
-    color: "#dc2626",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s ease"
-  },
-
-  logoutButtonHover: {
-    backgroundColor: "#fee2e2",
-    transform: "translateY(-1px)"
-  },
-
-  mainContent: {
-    flexGrow: 1,
+    gap: "32px",
+    width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#0b0f19",
     padding: "40px",
-    overflowY: "auto",
-    boxSizing: "border-box"
+    borderRadius: "24px"
   },
-
-  contentHeader: {
-    marginBottom: "32px"
-  },
-
-  breadcrumbWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    marginBottom: "12px",
-    fontSize: "13px",
-    fontWeight: "600"
-  },
-
-  breadcrumb: {
-    color: "#2563eb",
-    cursor: "pointer"
-  },
-
-  breadcrumbSeparator: {
-    color: "#94a3b8"
-  },
-
-  breadcrumbActive: {
-    color: "#64748b"
-  },
-
-  pageTitle: {
-    fontSize: "28px",
-    fontWeight: "800",
-    color: "#1e293b",
-    margin: "0 0 6px 0"
-  },
-
-  pageSubtitle: {
-    fontSize: "14px",
-    color: "#64748b",
-    margin: 0
-  },
-
-  assignmentGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "20px"
-  },
-
-  assignmentCard: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "14px",
-    padding: "20px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "14px"
-  },
-
-  assignmentTop: {
-    display: "flex",
-    alignItems: "center",
-    gap: "14px"
-  },
-
-  assignmentIcon: {
-    fontSize: "24px",
-    backgroundColor: "#eff6ff",
-    padding: "12px",
-    borderRadius: "12px"
-  },
-
-  assignmentTitle: {
-    margin: 0,
-    fontSize: "17px",
-    fontWeight: "700",
-    color: "#1e293b"
-  },
-
-  assignmentSubject: {
-    margin: "4px 0 0 0",
-    fontSize: "13px",
-    color: "#64748b",
-    fontWeight: "600"
-  },
-
-  assignmentDescription: {
-    margin: 0,
-    fontSize: "14px",
-    color: "#475569",
-    lineHeight: "1.5"
-  },
-
-  assignmentFooter: {
+  headerRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: "auto"
+    flexWrap: "wrap",
+    gap: "16px"
   },
-
-  dueDate: {
+  heading: {
+    fontSize: "28px",
+    fontWeight: "800",
+    margin: "0 0 6px 0",
+    letterSpacing: "-0.5px",
+    background: "linear-gradient(to right, #ffffff, #cbd5e1)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
+  },
+  subheading: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#94a3b8"
+  },
+  addBtn: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    border: "1px solid rgba(255, 255, 255, 0.05)",
+    color: "#ffffff",
+    padding: "12px 24px",
+    borderRadius: "14px",
     fontSize: "13px",
-    color: "#dc2626",
+    fontWeight: "700",
+    cursor: "pointer",
+    transition: "all 0.2s"
+  },
+  formContainer: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(99, 102, 241, 0.2)",
+    borderRadius: "20px",
+    padding: "24px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px"
+  },
+  formTitle: {
+    margin: 0,
+    color: "#ffffff",
+    fontSize: "14px",
     fontWeight: "700"
   },
-
-  viewButton: {
-    backgroundColor: "#2563eb",
-    color: "#fff",
+  formGrid: {
+    display: "grid",
+    gridTemplateColumns: "2fr 1.5fr 1.5fr 1fr",
+    gap: "14px",
+    alignItems: "center",
+    "@media(max-width: 800px)": {
+      gridTemplateColumns: "1fr"
+    }
+  },
+  input: {
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
+    border: "1px solid rgba(255, 255, 255, 0.05)",
+    borderRadius: "10px",
+    color: "#ffffff",
+    padding: "12px 16px",
+    fontSize: "13px",
+    outline: "none"
+  },
+  select: {
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
+    border: "1px solid rgba(255, 255, 255, 0.05)",
+    borderRadius: "10px",
+    color: "#cbd5e1",
+    padding: "12px 16px",
+    fontSize: "13px",
+    outline: "none",
+    cursor: "pointer"
+  },
+  submitBtn: {
+    backgroundColor: "#6366f1",
     border: "none",
-    padding: "9px 16px",
-    borderRadius: "8px",
-    cursor: "pointer",
+    color: "#ffffff",
+    padding: "12px",
+    borderRadius: "10px",
+    fontWeight: "700",
+    fontSize: "13px",
+    cursor: "pointer"
+  },
+  board: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "24px",
+    alignItems: "start",
+    "@media(max-width: 900px)": {
+      gridTemplateColumns: "1fr"
+    }
+  },
+  column: {
+    backgroundColor: "rgba(15, 23, 42, 0.25)",
+    border: "1px solid rgba(255, 255, 255, 0.02)",
+    borderRadius: "22px",
+    padding: "20px"
+  },
+  columnHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px"
+  },
+  columnTitle: {
+    fontSize: "15px",
+    fontWeight: "800",
+    color: "#ffffff",
+    margin: 0,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px"
+  },
+  countBadge: {
+    fontSize: "11px",
+    fontWeight: "700",
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    color: "#94a3b8",
+    padding: "3px 8px",
+    borderRadius: "6px"
+  },
+  taskStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px"
+  },
+  taskCard: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "16px",
+    padding: "18px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px"
+  },
+  taskHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px"
+  },
+  courseTag: {
+    fontSize: "10px",
+    fontWeight: "700",
+    color: "#818cf8",
+    backgroundColor: "rgba(99, 102, 241, 0.1)",
+    padding: "3px 6px",
+    borderRadius: "5px",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    overflow: "hidden"
+  },
+  deadlineTag: {
+    fontSize: "10px",
+    color: "#64748b",
+    fontWeight: "600"
+  },
+  taskTitle: {
+    fontSize: "13px",
     fontWeight: "600",
-    fontSize: "13px"
+    color: "#ffffff",
+    margin: 0,
+    lineHeight: "1.4"
+  },
+  actionRow: {
+    display: "flex",
+    marginTop: "6px",
+    borderTop: "1px solid rgba(255, 255, 255, 0.03)",
+    paddingTop: "12px"
+  },
+  actionBtn: {
+    backgroundColor: "transparent",
+    border: "none",
+    color: "#475569",
+    fontSize: "11px",
+    fontWeight: "700",
+    cursor: "pointer",
+    padding: "4px 8px",
+    borderRadius: "6px",
+    transition: "color 0.2s"
+  },
+  emptyColumnState: {
+    textAlign: "center",
+    color: "#475569",
+    fontSize: "12px",
+    padding: "24px",
+    border: "1px dashed rgba(255, 255, 255, 0.02)",
+    borderRadius: "12px"
   }
 };
 

@@ -1,333 +1,296 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import API from "../api/api";
+import { useState } from "react";
 
 function SemestersPage() {
-  const navigate = useNavigate();
-  const { courseId } = useParams();
+  const [selectedSem, setSelectedSem] = useState("Semester 4");
 
-  const [semesters, setSemesters] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [isLogoutHovered, setIsLogoutHovered] = useState(false);
-  const [hoveredCardId, setHoveredCardId] = useState(null);
+  const semesterData = [
+    { name: "Semester 1", sgpa: "8.50", status: "Completed", subjects: ["Mathematics-I", "Engineering Physics", "Basic Electrical Eng."] },
+    { name: "Semester 2", sgpa: "8.65", status: "Completed", subjects: ["Mathematics-II", "Engineering Chemistry", "Programming in C"] },
+    { name: "Semester 3", sgpa: "9.10", status: "Completed", subjects: ["Data Structures", "Digital Logic Design", "Discrete Mathematics"] },
+    { name: "Semester 4", sgpa: "8.84", status: "Ongoing", subjects: ["Advanced Operating Systems", "Design & Analysis of Algorithms", "Network Security & Cryptography", "Web Application Architectures"] }
+  ];
 
-  useEffect(() => {
-    fetchSemesters();
-  }, [courseId]);
-
-  const fetchSemesters = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await API.get(`/semester/course/${courseId}`);
-      setSemesters(response.data || []);
-    } catch (error) {
-      console.error("Error fetching semesters:", error);
-      setError("Failed to load semesters.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
+  const currentSem = semesterData.find(s => s.name === selectedSem);
 
   return (
-    <div style={styles.dashboardContainer}>
-    
+    <div style={styles.canvas}>
+      <div style={styles.header}>
+        <h2 style={styles.heading}>Semester Tracking Terminal</h2>
+        <p style={styles.subheading}>Monitor historical SGPA milestones, cumulative credits, and ongoing academic terms.</p>
+      </div>
 
-      {/* MAIN CONTENT */}
-      <main style={styles.mainContent}>
-        <header style={styles.contentHeader}>
-          <div>
-            <div style={styles.breadcrumbWrapper}>
-              <span style={styles.breadcrumb} onClick={() => navigate("/courses")}>
-                Courses
-              </span>
-              <span style={styles.breadcrumbSeparator}>/</span>
-              <span style={styles.breadcrumbActive}>Semesters</span>
-            </div>
-
-            <h1 style={styles.pageTitle}>Academic Semesters</h1>
-            <p style={styles.pageSubtitle}>
-              Select a semester to view its subjects and learning resources.
-            </p>
+      {/* Degree Progress Banner */}
+      <div style={styles.progressCard}>
+        <div style={styles.progressInfo}>
+          <span style={styles.progressTitle}>B.Tech Degree Completion Progress</span>
+          <span style={styles.progressPercentage}>50% Complete</span>
+        </div>
+        <div style={styles.track}>
+          <div style={styles.bar} />
+        </div>
+        <div style={styles.metricsRow}>
+          <div style={styles.metricItem}>
+            <span style={styles.metricLabel}>Cumulative CGPA</span>
+            <span style={styles.metricVal}>8.77 / 10</span>
           </div>
-        </header>
+          <div style={styles.metricItem}>
+            <span style={styles.metricLabel}>Completed Credits</span>
+            <span style={styles.metricVal}>76 / 152</span>
+          </div>
+          <div style={styles.metricItem}>
+            <span style={styles.metricLabel}>Target CGPA</span>
+            <span style={styles.metricVal}>9.00 Max</span>
+          </div>
+        </div>
+      </div>
 
-        {error && <div style={styles.errorBanner}>{error}</div>}
+      <div style={styles.splitLayout}>
+        {/* Semester Selection List */}
+        <div style={styles.listColumn}>
+          <h3 style={styles.columnTitle}>Academic Terms</h3>
+          <div style={styles.termStack}>
+            {semesterData.map((sem) => {
+              const isSelected = sem.name === selectedSem;
+              return (
+                <div
+                  key={sem.name}
+                  onClick={() => setSelectedSem(sem.name)}
+                  style={{
+                    ...styles.termCard,
+                    backgroundColor: isSelected ? "rgba(99, 102, 241, 0.12)" : "rgba(15, 23, 42, 0.2)",
+                    borderColor: isSelected ? "#6366f1" : "rgba(255, 255, 255, 0.04)"
+                  }}
+                >
+                  <div style={styles.termHeader}>
+                    <span style={{ ...styles.termName, color: isSelected ? "#ffffff" : "#cbd5e1" }}>{sem.name}</span>
+                    <span style={{
+                      ...styles.statusBadge,
+                      color: sem.status === "Ongoing" ? "#38bdf8" : "#10b981",
+                      backgroundColor: sem.status === "Ongoing" ? "rgba(56, 189, 248, 0.1)" : "rgba(16, 185, 129, 0.1)"
+                    }}>
+                      {sem.status}
+                    </span>
+                  </div>
+                  <div style={styles.termDetails}>
+                    <span style={styles.metricLabel}>SGPA:</span>
+                    <span style={styles.termSgpa}>{sem.sgpa || "Pending Evaluation"}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-        {loading ? (
-          <div style={styles.grid}>
-            {[1, 2, 3].map((n) => (
-              <div key={n} style={styles.skeletonCard}>
-                <div style={styles.skeletonCircle}></div>
-                <div style={styles.skeletonTitle}></div>
+        {/* Selected Semester Details View */}
+        <div style={styles.detailsColumn}>
+          <h3 style={styles.columnTitle}>{selectedSem} Subject Matrix</h3>
+          <p style={styles.detailSub}>Curriculum structure and course syllabus registration keys for this term.</p>
+          
+          <div style={styles.subjectStack}>
+            {currentSem.subjects.map((sub, idx) => (
+              <div key={idx} style={styles.subjectItem}>
+                <div style={styles.subjectIcon}>⚛️</div>
+                <div>
+                  <div style={styles.subjectTitle}>{sub}</div>
+                  <div style={styles.subjectMeta}>Course Module Unit — Track Certified</div>
+                </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div style={styles.grid}>
-            {semesters.length === 0 ? (
-              <p style={styles.emptyStateText}>No semesters found for this course.</p>
-            ) : (
-              semesters.map((semester) => (
-                <div
-                  key={semester.id}
-                  onClick={() => navigate(`/subjects/${semester.id}`)}
-                  onMouseEnter={() => setHoveredCardId(semester.id)}
-                  onMouseLeave={() => setHoveredCardId(null)}
-                  style={{
-                    ...styles.card,
-                    ...(hoveredCardId === semester.id ? styles.cardHover : {})
-                  }}
-                >
-                  <div
-                    style={{
-                      ...styles.iconWrapper,
-                      ...(hoveredCardId === semester.id ? styles.iconWrapperHover : {})
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-                      <path d="M6 6h10M6 10h10" />
-                    </svg>
-                  </div>
-
-                  <h2 style={styles.semesterTitle}>
-                    Semester {semester.semesterNumber}
-                  </h2>
-                  <p style={styles.semesterMeta}>Click to view subjects</p>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
 
 const styles = {
-  dashboardContainer: {
-    display: "flex",
-    height: "100vh",
-    width: "100vw",
-    backgroundColor: "#f8fafc",
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    overflow: "hidden"
-  },
-  sidebar: {
-    width: "260px",
-    backgroundColor: "#ffffff",
-    borderRight: "1px solid #e2e8f0",
-    padding: "24px 16px",
+  canvas: {
     display: "flex",
     flexDirection: "column",
-    boxSizing: "border-box"
-  },
-  brandWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    paddingLeft: "8px",
-    marginBottom: "32px"
-  },
-  logo: {
-    height: "36px",
-    width: "36px",
-    objectFit: "cover",
-    borderRadius: "50%"
-  },
-  brandName: {
-    fontSize: "20px",
-    fontWeight: "800",
-    color: "#1e293b",
-    letterSpacing: "-0.5px"
-  },
-  navMenu: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    flexGrow: 1
-  },
-  navItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px 14px",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "#64748b",
-    cursor: "pointer",
-    transition: "all 0.2s ease"
-  },
-  navItemActive: {
-    backgroundColor: "#f1f5f9",
-    color: "#2563eb"
-  },
-  navIcon: {
-    color: "inherit"
-  },
-  logoutButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    padding: "12px",
-    backgroundColor: "#fef2f2",
-    color: "#dc2626",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s ease"
-  },
-  logoutButtonHover: {
-    backgroundColor: "#fee2e2",
-    transform: "translateY(-1px)"
-  },
-  mainContent: {
-    flexGrow: 1,
+    gap: "32px",
+    width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#0b0f19",
     padding: "40px",
-    overflowY: "auto",
-    boxSizing: "border-box"
+    borderRadius: "24px"
   },
-  contentHeader: {
-    marginBottom: "32px"
+  header: {
+    marginBottom: "8px"
   },
-  breadcrumbWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    marginBottom: "12px",
-    fontSize: "13px",
-    fontWeight: "600"
-  },
-  breadcrumb: {
-    color: "#2563eb",
-    cursor: "pointer"
-  },
-  breadcrumbSeparator: {
-    color: "#94a3b8"
-  },
-  breadcrumbActive: {
-    color: "#64748b"
-  },
-  pageTitle: {
+  heading: {
     fontSize: "28px",
     fontWeight: "800",
-    color: "#1e293b",
-    margin: "0 0 6px 0"
+    margin: "0 0 6px 0",
+    letterSpacing: "-0.5px",
+    background: "linear-gradient(to right, #ffffff, #cbd5e1)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
   },
-  pageSubtitle: {
+  subheading: {
+    margin: 0,
     fontSize: "14px",
-    color: "#64748b",
-    margin: 0
+    color: "#94a3b8"
   },
-  errorBanner: {
-    backgroundColor: "#fef2f2",
-    color: "#dc2626",
-    padding: "14px",
-    borderRadius: "10px",
-    fontSize: "14px",
-    marginBottom: "24px",
-    border: "1px solid #fee2e2",
-    fontWeight: "500"
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-    gap: "24px"
-  },
-  card: {
-    background: "#ffffff",
-    padding: "32px 24px",
-    borderRadius: "14px",
-    border: "1px solid #e2e8f0",
-    cursor: "pointer",
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.02)",
-    textAlign: "center",
+  progressCard: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "20px",
+    padding: "28px",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center"
+    gap: "16px"
   },
-  cardHover: {
-    transform: "translateY(-4px)",
-    borderColor: "#2563eb",
-    boxShadow: "0 12px 20px -8px rgba(37, 99, 235, 0.15)"
-  },
-  iconWrapper: {
-    width: "48px",
-    height: "48px",
-    borderRadius: "10px",
-    backgroundColor: "#f8fafc",
-    color: "#64748b",
+  progressInfo: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: "16px",
-    transition: "all 0.2s ease"
+    justifyContent: "space-between",
+    alignItems: "center"
   },
-  iconWrapperHover: {
-    backgroundColor: "#eff6ff",
-    color: "#2563eb"
+  progressTitle: {
+    fontSize: "15px",
+    fontWeight: "700",
+    color: "#ffffff"
   },
-  semesterTitle: {
+  progressPercentage: {
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "#818cf8"
+  },
+  track: {
+    height: "8px",
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: "4px",
+    overflow: "hidden"
+  },
+  bar: {
+    height: "100%",
+    backgroundColor: "#6366f1",
+    width: "50%",
+    borderRadius: "4px"
+  },
+  metricsRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+    paddingTop: "20px",
+    flexWrap: "wrap",
+    gap: "16px"
+  },
+  metricItem: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px"
+  },
+  metricLabel: {
+    fontSize: "11px",
+    color: "#475569",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    fontWeight: "700"
+  },
+  metricVal: {
+    fontSize: "16px",
+    fontWeight: "700",
+    color: "#cbd5e1"
+  },
+  splitLayout: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1.5fr",
+    gap: "28px",
+    alignItems: "start",
+    "@media(max-width: 850px)": {
+      gridTemplateColumns: "1fr"
+    }
+  },
+  listColumn: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
+    padding: "24px"
+  },
+  columnTitle: {
     fontSize: "18px",
     fontWeight: "700",
-    color: "#1e293b",
-    margin: "0 0 4px 0"
+    color: "#ffffff",
+    marginBottom: "20px"
   },
-  semesterMeta: {
-    margin: 0,
-    fontSize: "13px",
-    color: "#64748b"
-  },
-  emptyStateText: {
-    color: "#64748b",
-    fontSize: "14px"
-  },
-  skeletonCard: {
-    background: "#ffffff",
-    padding: "32px 24px",
-    borderRadius: "14px",
-    border: "1px solid #f1f5f9",
+  termStack: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    boxSizing: "border-box"
+    gap: "12px"
   },
-  skeletonCircle: {
-    height: "48px",
-    width: "48px",
-    backgroundColor: "#f1f5f9",
-    borderRadius: "10px",
-    marginBottom: "16px"
+  termCard: {
+    border: "1px solid",
+    borderRadius: "14px",
+    padding: "16px",
+    cursor: "pointer",
+    transition: "all 0.2s"
   },
-  skeletonTitle: {
-    height: "20px",
-    width: "60%",
-    backgroundColor: "#f1f5f9",
+  termHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  termName: {
+    fontSize: "14px",
+    fontWeight: "700"
+  },
+  statusBadge: {
+    fontSize: "11px",
+    fontWeight: "600",
+    padding: "3px 8px",
     borderRadius: "6px"
+  },
+  termDetails: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "12px"
+  },
+  termSgpa: {
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "#cbd5e1"
+  },
+  detailsColumn: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
+    padding: "28px"
+  },
+  detailSub: {
+    fontSize: "13px",
+    color: "#64748b",
+    marginTop: "4px",
+    marginBottom: "24px"
+  },
+  subjectStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px"
+  },
+  subjectItem: {
+    display: "flex",
+    gap: "16px",
+    alignItems: "center",
+    backgroundColor: "rgba(15, 23, 42, 0.3)",
+    border: "1px solid rgba(255, 255, 255, 0.02)",
+    padding: "16px",
+    borderRadius: "14px"
+  },
+  subjectIcon: {
+    fontSize: "20px"
+  },
+  subjectTitle: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#ffffff"
+  },
+  subjectMeta: {
+    fontSize: "11px",
+    color: "#475569",
+    marginTop: "4px",
+    fontWeight: "500"
   }
 };
 

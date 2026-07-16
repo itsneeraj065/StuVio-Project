@@ -4,6 +4,52 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StuVio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+    /* Custom Dark Theme Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.3);
+    }
+
+    /* Base body adjustments */
+    body {
+      margin: 0;
+      background-color: #0b0f19;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* DROPPING DOWNWARD ENTRANCE ANIMATION */
+    @keyframes dropFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px); /* Start slightly higher */
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0); /* Drop down to its natural position */
+      }
+    }
+
+    /* Utility Class for dropping animations */
+    .animate-drop {
+      animation: dropFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
   </head>
   <body>
     <div id="root"></div>

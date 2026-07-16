@@ -1,146 +1,68 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useApp } from "../context/AppContext";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLogoutHovered, setIsLogoutHovered] = useState(false);
+  const { user, logout } = useApp();
 
-  const isActive = (path) => {
-    return location.pathname === path || location.pathname.startsWith(path + "/");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
+  const navItems = [
+    { name: "Dashboard", path: "dashboard", icon: "📊" },
+    { name: "My Courses", path: "courses", icon: "📚" },
+    { name: "Semesters", path: "semesters", icon: "⏳" },
+    { name: "Subjects", path: "subjects", icon: "🔬" },
+    { name: "Resources", path: "resources", icon: "📁" },
+    { name: "Videos", path: "videos", icon: "🎥" },
+    { name: "Notes", path: "notes", icon: "📝" },
+    { name: "Assignments", path: "assignments", icon: "📄" },
+    { name: "Schedule", path: "schedule", icon: "📅" },
+    { name: "Certificates", path: "certificates", icon: "🏆" },
+    { name: "Profile", path: "profile", icon: "👤" },
+  ];
 
   return (
     <aside style={styles.sidebar}>
-      {/* Brand */}
-      <div
-        onClick={() => navigate("/dashboard")}
-        style={{ ...styles.brandWrapper, cursor: "pointer" }}
-      >
-        <img
-          src="/logo.jpg"
-          alt="StuVio Logo"
-          style={styles.logo}
-          onError={(e) => {
-            e.target.style.display = "none";
-          }}
-        />
-        <span style={styles.brandName}>StuVio</span>
+      <div>
+        <div style={styles.logoRow}>
+          <span style={styles.logoText}>StuVio Portal</span>
+        </div>
+
+        {user && (
+          <div style={styles.profileBox}>
+            <div style={styles.profileAvatar}>
+              {user.name ? user.name.charAt(0) : "S"}
+            </div>
+            <div>
+              <div style={styles.userName}>{user.name || "Student"}</div>
+              <div style={styles.userRole}>{user.track || "Undergraduate"}</div>
+            </div>
+          </div>
+        )}
+
+        <nav style={styles.navStack}>
+          {navItems.map((item) => {
+            const isActive = location.pathname.endsWith(item.path);
+            return (
+              <div
+                key={item.path}
+                onClick={() => navigate(`/portal/${item.path}`)}
+                style={{
+                  ...styles.navLink,
+                  backgroundColor: isActive ? "rgba(99, 102, 241, 0.1)" : "transparent",
+                  color: isActive ? "#818cf8" : "#94a3b8"
+                }}
+              >
+                <span style={styles.navIcon}>{item.icon}</span>
+                <span>{item.name}</span>
+              </div>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Main nav */}
-      <nav style={styles.navMenu}>
-        <div
-          onClick={() => navigate("/dashboard")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/dashboard") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>🏠</span>
-          Dashboard
-        </div>
-
-        <div
-          onClick={() => navigate("/courses")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/courses") || isActive("/semesters") || isActive("/subjects") || isActive("/resources")
-              ? styles.navItemActive
-              : {})
-          }}
-        >
-          <span style={styles.icon}>📚</span>
-          My Courses
-        </div>
-
-        <div
-          onClick={() => navigate("/assignments")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/assignments") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>📝</span>
-          Assignments
-        </div>
-
-        <div
-          onClick={() => navigate("/notes")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/notes") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>📘</span>
-          Notes
-        </div>
-
-        <div
-          onClick={() => navigate("/videos")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/videos") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>🎥</span>
-          Videos
-        </div>
-
-        <div
-          onClick={() => navigate("/calendar")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/calendar") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>📅</span>
-          Calendar
-        </div>
-
-        <div
-          onClick={() => navigate("/profile")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/profile") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>👤</span>
-          Profile
-        </div>
-      </nav>
-
-      {/* Bottom section */}
-      <div style={styles.bottomSection}>
-        <div
-          onClick={() => navigate("/settings")}
-          style={{
-            ...styles.navItem,
-            ...(isActive("/settings") ? styles.navItemActive : {})
-          }}
-        >
-          <span style={styles.icon}>⚙️</span>
-          Settings
-        </div>
-
-        <button
-          onClick={handleLogout}
-          onMouseEnter={() => setIsLogoutHovered(true)}
-          onMouseLeave={() => setIsLogoutHovered(false)}
-          style={{
-            ...styles.logoutButton,
-            ...(isLogoutHovered ? styles.logoutButtonHover : {})
-          }}
-        >
-          <span style={styles.icon}>🚪</span>
-          Logout
-        </button>
-      </div>
+      <button onClick={logout} style={styles.logoutBtn}>
+        🚪 System Logout
+      </button>
     </aside>
   );
 }
@@ -148,85 +70,87 @@ function Sidebar() {
 const styles = {
   sidebar: {
     width: "260px",
-    minWidth: "260px",
-    backgroundColor: "#ffffff",
-    borderRight: "1px solid #e2e8f0",
-    padding: "24px 16px",
+    backgroundColor: "#0d1321",
+    borderRight: "1px solid rgba(255, 255, 255, 0.05)",
     display: "flex",
     flexDirection: "column",
-    boxSizing: "border-box",
-    height: "100vh"
+    justifyContent: "space-between",
+    padding: "24px 16px",
+    height: "100vh",
+    position: "sticky",
+    top: 0
   },
-  brandWrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    paddingLeft: "8px",
-    marginBottom: "32px"
+  logoRow: {
+    padding: "0 12px 24px 12px",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)"
   },
-  logo: {
-    height: "38px",
-    width: "38px",
-    objectFit: "cover",
-    borderRadius: "50%"
-  },
-  brandName: {
-    fontSize: "22px",
+  logoText: {
+    fontSize: "18px",
     fontWeight: "800",
-    color: "#1e293b",
+    color: "#ffffff",
     letterSpacing: "-0.5px"
   },
-  navMenu: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    flexGrow: 1
-  },
-  navItem: {
+  profileBox: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    padding: "12px 14px",
-    borderRadius: "10px",
-    fontSize: "14px",
+    padding: "16px 12px",
+    backgroundColor: "rgba(255, 255, 255, 0.02)",
+    borderRadius: "12px",
+    margin: "16px 0 24px 0",
+    border: "1px solid rgba(255, 255, 255, 0.04)"
+  },
+  profileAvatar: {
+    width: "36px",
+    height: "36px",
+    backgroundColor: "#6366f1",
+    color: "#ffffff",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: "700",
+    fontSize: "14px"
+  },
+  userName: {
+    fontSize: "13px",
     fontWeight: "600",
+    color: "#ffffff"
+  },
+  userRole: {
+    fontSize: "11px",
     color: "#64748b",
+    marginTop: "2px"
+  },
+  navStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px"
+  },
+  navLink: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "10px 16px",
+    borderRadius: "8px",
+    fontSize: "13px",
+    fontWeight: "600",
     cursor: "pointer",
     transition: "all 0.2s ease"
   },
-  navItemActive: {
-    backgroundColor: "#eff6ff",
-    color: "#2563eb"
+  navIcon: {
+    fontSize: "16px"
   },
-  icon: {
-    fontSize: "16px",
-    width: "20px",
-    textAlign: "center"
-  },
-  bottomSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    marginTop: "16px"
-  },
-  logoutButton: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    width: "100%",
-    padding: "12px 14px",
-    backgroundColor: "#fef2f2",
-    color: "#dc2626",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontWeight: "600",
+  logoutBtn: {
+    backgroundColor: "rgba(239, 68, 68, 0.08)",
+    border: "1px solid rgba(239, 68, 68, 0.15)",
+    color: "#f87171",
+    padding: "10px",
+    borderRadius: "8px",
+    fontSize: "12px",
+    fontWeight: "700",
     cursor: "pointer",
-    transition: "all 0.2s ease",
-    textAlign: "left"
-  },
-  logoutButtonHover: {
-    backgroundColor: "#fee2e2"
+    transition: "background 0.2s"
   }
 };
 

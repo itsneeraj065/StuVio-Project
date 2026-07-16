@@ -1,313 +1,403 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function NotesPage() {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("All");
-
-  // Sample data simulating notes uploaded for the student
-  const notesData = [
-    {
-      id: 1,
-      title: "Data Structures & Algorithms - Complete Cheat Sheet",
-      subject: "Computer Science",
-      fileType: "PDF",
-      fileSize: "4.2 MB",
-      dateAdded: "June 28, 2026",
-      icon: "💻"
-    },
-    {
-      id: 2,
-      title: "Linear Algebra & Vector Calculus Lecture Notes",
-      subject: "Mathematics",
-      fileType: "PDF",
-      fileSize: "8.7 MB",
-      dateAdded: "July 01, 2026",
-      icon: "📐"
-    },
-    {
-      id: 3,
-      title: "UI/UX Design Systems & Typography Basics",
-      subject: "Design",
-      fileType: "ZIP",
-      fileSize: "15.4 MB",
-      dateAdded: "June 15, 2026",
-      icon: "🎨"
-    },
-    {
-      id: 4,
-      title: "Database Management Systems (DBMS) SQL Guide",
-      subject: "Computer Science",
-      fileType: "PDF",
-      fileSize: "3.1 MB",
-      dateAdded: "July 03, 2026",
-      icon: "💾"
-    }
-  ];
-
-  const subjects = ["All", "Computer Science", "Mathematics", "Design"];
-
-  // Filter logic based on search input and selected filter tab
-  const filteredNotes = notesData.filter((note) => {
-    const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSubject = selectedSubject === "All" || note.subject === selectedSubject;
-    return matchesSearch && matchesSubject;
+  // Load notes from localStorage or default to your core exam notes
+  const [notes, setNotes] = useState(() => {
+    const saved = localStorage.getItem("student_notes");
+    if (saved) return JSON.parse(saved);
+    return [
+      {
+        id: 1,
+        title: "Mutual Exclusion & Peterson's Algorithm",
+        subject: "CS-402",
+        date: "July 12, 2026",
+        content: "Peterson's algorithm is a concurrent programming algorithm for mutual exclusion that allows two processes to share a single-use resource without conflict.\n\nKey requirements met:\n1. Mutual Exclusion: Yes\n2. Progress: Yes\n3. Bounded Waiting: Yes\n\nCode representation relies on shared flags and a turn variable."
+      },
+      {
+        id: 2,
+        title: "Asymmetric Key Math (RSA Algorithm)",
+        subject: "CS-408",
+        date: "July 15, 2026",
+        content: "RSA security depends on the mathematical difficulty of factoring large prime numbers.\n\nSteps:\n1. Select two prime numbers, p and q.\n2. Compute n = p * q.\n3. Compute phi(n) = (p - 1) * (q - 1).\n4. Choose public exponent e.\n5. Compute private key d."
+      }
+    ];
   });
 
-  return (
-    <div style={styles.page}>
-      {/* HEADER SECTION */}
-      <header style={styles.header}>
-        <div>
-          <h1 style={styles.title}>Study Notes 📝</h1>
-          <p style={styles.subtitle}>
-            Access, read, and download all notes uploaded by your instructors.
-          </p>
-        </div>
-        <button style={styles.backButton} onClick={() => navigate("/dashboard")}>
-          ← Back to Dashboard
-        </button>
-      </header>
+  const [selectedNoteId, setSelectedNoteId] = useState(() => {
+    return notes.length > 0 ? notes[0].id : null;
+  });
 
-      {/* SEARCH AND FILTER BAR */}
-      <div style={styles.toolbar}>
-        <input
-          type="text"
-          placeholder="Search notes by title..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={styles.searchInput}
-        />
-        
-        <div style={styles.filterGroup}>
-          {subjects.map((sub) => (
-            <button
-              key={sub}
-              onClick={() => setSelectedSubject(sub)}
-              style={{
-                ...styles.filterBtn,
-                ...(selectedSubject === sub ? styles.filterBtnActive : {})
-              }}
-            >
-              {sub}
-            </button>
-          ))}
+  // Editor states
+  const [editingTitle, setEditingTitle] = useState("");
+  const [editingContent, setEditingContent] = useState("");
+  const [editingSubject, setEditingSubject] = useState("CS-402");
+
+  // Keep localStorage continuously updated with latest logs
+  useEffect(() => {
+    localStorage.setItem("student_notes", JSON.stringify(notes));
+  }, [notes]);
+
+  // Safely sync editor input states when a new card is selected
+  useEffect(() => {
+    const activeNote = notes.find(n => n.id === selectedNoteId);
+    if (activeNote) {
+      setEditingTitle(activeNote.title);
+      setEditingContent(activeNote.content);
+      setEditingSubject(activeNote.subject);
+    } else {
+      setEditingTitle("");
+      setEditingContent("");
+      setEditingSubject("CS-402");
+    }
+  }, [selectedNoteId]);
+
+  // Keystroke Auto-Save: updates active note in real-time
+  const updateActiveNoteField = (field, value) => {
+    if (field === "title") setEditingTitle(value);
+    if (field === "content") setEditingContent(value);
+    if (field === "subject") setEditingSubject(value);
+
+    setNotes(prevNotes => prevNotes.map(n => {
+      if (n.id === selectedNoteId) {
+        return {
+          ...n,
+          [field]: value
+        };
+      }
+      return n;
+    }));
+  };
+
+  // Create a brand new blank note draft
+  const handleNewNote = () => {
+    const newId = notes.length > 0 ? Math.max(...notes.map(n => n.id)) + 1 : 1;
+    const blankNote = {
+      id: newId,
+      title: "Untitled Quick Note",
+      subject: "CS-402",
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      content: "Start writing your notes here..."
+    };
+    
+    setNotes([blankNote, ...notes]);
+    setSelectedNoteId(blankNote.id);
+  };
+
+  // Delete memo handler
+  const handleDeleteNote = (id, e) => {
+    e.stopPropagation(); // Prevent re-selecting deleted card
+    const remaining = notes.filter(n => n.id !== id);
+    setNotes(remaining);
+    
+    if (selectedNoteId === id) {
+      setSelectedNoteId(remaining.length > 0 ? remaining[0].id : null);
+    }
+  };
+
+  const selectedNote = notes.find(n => n.id === selectedNoteId);
+
+  return (
+    <div style={styles.canvas} className="slide-down-panel">
+      {/* Dynamic Keyframes to animate sidebar cards seamlessly */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes customDropFade {
+          0% {
+            opacity: 0;
+            transform: translateY(-16px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .slide-down-panel {
+          animation: customDropFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .stagger-note {
+          opacity: 0;
+          animation: customDropFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.1s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.2s; }
+      `}} />
+
+      <div style={styles.headerRow}>
+        <div>
+          <h2 style={styles.heading}>Personal Study Ledger</h2>
+          <p style={styles.subheading}>Maintain persistent exam summaries, algorithm steps, and laboratory journals.</p>
         </div>
+        <button onClick={handleNewNote} style={styles.newBtn}>+ Add New Memo</button>
       </div>
 
-      {/* NOTES GRID CONTAINER */}
-      {filteredNotes.length > 0 ? (
-        <div style={styles.grid}>
-          {filteredNotes.map((note) => (
-            <div key={note.id} style={styles.card}>
-              <div style={styles.cardHeader}>
-                <div style={styles.iconBadge}>{note.icon}</div>
-                <span style={styles.subjectBadge}>{note.subject}</span>
-              </div>
-              
-              <h3 style={styles.noteTitle}>{note.title}</h3>
-              
-              <div style={styles.metaRow}>
-                <span style={styles.metaText}>📅 {note.dateAdded}</span>
-                <span style={styles.metaText}>💾 {note.fileSize} ({note.fileType})</span>
-              </div>
-
-              <button 
-                style={styles.downloadButton}
-                onClick={() => alert(`Starting download for: ${note.title}`)}
-              >
-                <svg
-                  style={{ marginRight: "6px" }}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+      <div style={styles.layout}>
+        {/* Sidebar notes list */}
+        <div style={styles.sidebar}>
+          <div style={styles.listStack}>
+            {notes.map((note, index) => {
+              const isSelected = note.id === selectedNoteId;
+              return (
+                <div
+                  key={note.id}
+                  onClick={() => setSelectedNoteId(note.id)}
+                  style={{
+                    ...styles.noteCard,
+                    backgroundColor: isSelected ? "rgba(99, 102, 241, 0.12)" : "rgba(15, 23, 42, 0.2)",
+                    borderColor: isSelected ? "#6366f1" : "rgba(255, 255, 255, 0.04)"
+                  }}
+                  className={`stagger-note delay-${Math.min(index + 1, 4)}`}
                 >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" x2="12" y1="15" y2="3" />
-                </svg>
-                Download Resource
-              </button>
+                  <div style={styles.cardHeader}>
+                    <span style={styles.subTag}>{note.subject}</span>
+                    <div style={styles.rightHeaderNode}>
+                      <span style={styles.dateText}>{note.date}</span>
+                      <button 
+                        onClick={(e) => handleDeleteNote(note.id, e)} 
+                        style={styles.deleteBtn}
+                        title="Delete Note"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                  <h4 style={styles.cardTitle}>{note.title}</h4>
+                  <p style={styles.cardExcerpt}>
+                    {note.content && note.content.length > 60 ? `${note.content.substring(0, 60)}...` : note.content}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Note Editor Area */}
+        {selectedNote ? (
+          <div style={styles.editor}>
+            <div style={styles.editorHeader}>
+              <div style={styles.metaInputs}>
+                <input
+                  type="text"
+                  value={editingTitle}
+                  onChange={(e) => updateActiveNoteField("title", e.target.value)}
+                  style={styles.titleInput}
+                  placeholder="Note Title"
+                />
+                <select
+                  value={editingSubject}
+                  onChange={(e) => updateActiveNoteField("subject", e.target.value)}
+                  style={styles.selectInput}
+                >
+                  <option value="CS-402">CS-402 (Operating Systems)</option>
+                  <option value="CS-406">CS-406 (Algorithms)</option>
+                  <option value="CS-408">CS-408 (Cryptography)</option>
+                  <option value="CS-410">CS-410 (Web Arch)</option>
+                </select>
+              </div>
+              <span style={styles.autoSavedBadge}>✓ Auto-saving live</span>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div style={styles.emptyState}>
-          <p style={styles.emptyText}>No study notes found matching your criteria.</p>
-        </div>
-      )}
+
+            <textarea
+              value={editingContent}
+              onChange={(e) => updateActiveNoteField("content", e.target.value)}
+              style={styles.textArea}
+              placeholder="Write your study notes here..."
+            />
+          </div>
+        ) : (
+          <div style={styles.emptyEditor}>
+            Select a note from the ledger or add a new memo to start editing.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: "#f8fafc",
-    padding: "40px",
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    boxSizing: "border-box"
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "32px"
-  },
-  title: {
-    fontSize: "30px",
-    fontWeight: "800",
-    color: "#1e293b",
-    margin: "0 0 6px 0"
-  },
-  subtitle: {
-    color: "#64748b",
-    fontSize: "15px",
-    margin: 0
-  },
-  backButton: {
-    backgroundColor: "#ffffff",
-    color: "#64748b",
-    border: "1px solid #e2e8f0",
-    padding: "10px 16px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontWeight: "600",
-    fontSize: "14px",
-    transition: "all 0.2s"
-  },
-  toolbar: {
+  canvas: {
     display: "flex",
     flexDirection: "column",
-    gap: "16px",
-    marginBottom: "32px"
-  },
-  searchInput: {
-    padding: "14px 16px",
-    borderRadius: "10px",
-    border: "1px solid #e2e8f0",
-    fontSize: "15px",
-    backgroundColor: "#ffffff",
+    gap: "32px",
     width: "100%",
-    maxWidth: "400px",
-    outline: "none",
-    boxSizing: "border-box"
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#0b0f19",
+    padding: "40px",
+    borderRadius: "24px"
   },
-  filterGroup: {
+  headerRow: {
     display: "flex",
-    gap: "8px",
-    flexWrap: "wrap"
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "16px"
   },
-  filterBtn: {
-    padding: "8px 16px",
-    borderRadius: "20px",
-    border: "1px solid #e2e8f0",
-    backgroundColor: "#ffffff",
-    color: "#64748b",
-    fontSize: "13px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s"
+  heading: {
+    fontSize: "28px",
+    fontWeight: "800",
+    margin: "0 0 6px 0",
+    letterSpacing: "-0.5px",
+    background: "linear-gradient(to right, #ffffff, #cbd5e1)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
   },
-  filterBtnActive: {
-    backgroundColor: "#2563eb",
-    borderColor: "#2563eb",
-    color: "#ffffff"
+  subheading: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#94a3b8"
   },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-    gap: "24px"
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e2e8f0",
+  newBtn: {
+    backgroundColor: "#6366f1",
+    color: "#ffffff",
+    border: "none",
+    padding: "12px 24px",
     borderRadius: "14px",
-    padding: "24px",
+    fontSize: "13px",
+    fontWeight: "700",
+    cursor: "pointer",
+    transition: "background-color 0.2s"
+  },
+  layout: {
+    display: "grid",
+    gridTemplateColumns: "1fr 2fr",
+    gap: "28px",
+    minHeight: "550px"
+  },
+  sidebar: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
+    padding: "20px",
+    maxHeight: "600px",
+    overflowY: "auto"
+  },
+  listStack: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
-    transition: "transform 0.2s"
+    gap: "12px"
+  },
+  noteCard: {
+    border: "1px solid",
+    borderRadius: "14px",
+    padding: "16px",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px"
   },
   cardHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "16px"
+    alignItems: "center"
   },
-  iconBadge: {
-    width: "40px",
-    height: "40px",
-    backgroundColor: "#f1f5f9",
-    borderRadius: "10px",
+  rightHeaderNode: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    fontSize: "20px"
+    gap: "10px"
   },
-  subjectBadge: {
-    fontSize: "12px",
+  subTag: {
+    fontSize: "10px",
     fontWeight: "700",
-    color: "#2563eb",
-    backgroundColor: "#eff6ff",
-    padding: "4px 10px",
-    borderRadius: "12px"
+    color: "#818cf8"
   },
-  noteTitle: {
-    fontSize: "16px",
+  dateText: {
+    fontSize: "11px",
+    color: "#475569",
+    fontWeight: "500"
+  },
+  deleteBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "13px",
+    padding: 0,
+    opacity: 0.5,
+    transition: "opacity 0.2s"
+  },
+  cardTitle: {
+    fontSize: "14px",
     fontWeight: "700",
-    color: "#1e293b",
-    margin: "0 0 12px 0",
+    color: "#ffffff",
+    margin: 0,
     lineHeight: "1.4"
   },
-  metaRow: {
-    display: "flex",
-    justifyContent: "space-between",
+  cardExcerpt: {
     fontSize: "12px",
     color: "#64748b",
-    marginBottom: "20px",
-    borderTop: "1px dashed #e2e8f0",
-    paddingTop: "12px"
+    lineHeight: "1.5",
+    margin: 0
   },
-  metaText: {
+  editor: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
+    padding: "28px",
     display: "flex",
-    alignItems: "center",
-    gap: "4px"
+    flexDirection: "column",
+    gap: "24px"
   },
-  downloadButton: {
-    width: "100%",
-    backgroundColor: "#2563eb",
-    color: "#ffffff",
+  editorHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+    paddingBottom: "20px"
+  },
+  metaInputs: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    flex: 1
+  },
+  titleInput: {
+    backgroundColor: "transparent",
     border: "none",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "14px",
+    fontSize: "20px",
+    fontWeight: "800",
+    color: "#ffffff",
+    outline: "none",
+    width: "90%"
+  },
+  selectInput: {
+    backgroundColor: "transparent",
+    border: "none",
+    color: "#64748b",
+    fontSize: "12px",
     fontWeight: "600",
-    cursor: "pointer",
+    outline: "none",
+    cursor: "pointer"
+  },
+  autoSavedBadge: {
+    fontSize: "12px",
+    fontWeight: "600",
+    color: "#10b981",
+    backgroundColor: "rgba(16, 185, 129, 0.1)",
+    padding: "6px 12px",
+    borderRadius: "8px"
+  },
+  textArea: {
+    flex: 1,
+    backgroundColor: "transparent",
+    border: "none",
+    color: "#cbd5e1",
+    fontSize: "14px",
+    lineHeight: "1.7",
+    outline: "none",
+    resize: "none",
+    fontFamily: "inherit",
+    minHeight: "350px"
+  },
+  emptyEditor: {
+    backgroundColor: "rgba(30, 41, 59, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.04)",
+    borderRadius: "22px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "background-color 0.2s"
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "60px 20px",
-    backgroundColor: "#ffffff",
-    borderRadius: "12px",
-    border: "1px dashed #e2e8f0"
-  },
-  emptyText: {
-    color: "#64748b",
-    fontSize: "15px",
-    margin: 0
+    color: "#475569",
+    fontSize: "14px"
   }
 };
 
