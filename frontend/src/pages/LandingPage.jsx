@@ -147,7 +147,9 @@ const styles = {
   container: {
     backgroundColor: "#0b0f19",
     color: "#cbd5e1",
-    minHeight: "100vh"
+    minHeight: "100vh",
+    display: "flex",     
+    flexDirection: "column" // Add this   // Add this
   },
   navbar: {
     display: "flex",
@@ -350,7 +352,8 @@ const styles = {
   },
   footer: {
     borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-    padding: "30px 40px"
+    padding: "30px 40px" , 
+    marginTop: "auto" // This pushes the footer to the very bottom
   },
   footerRow: {
     display: "flex",
