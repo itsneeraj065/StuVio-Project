@@ -29,15 +29,17 @@ function LandingPage() {
     <div style={styles.container}>
       
       {/* PUBLIC HEADER NAVBAR */}
-      <header style={styles.navbar}>
-        <div style={styles.logo}>StuVio</div>
-        <nav style={styles.navLinks}>
-          <a href="#features" style={styles.navLink}>Features</a>
-          <a href="#stats" style={styles.navLink}>Impact</a>
-          <a href="#reviews" style={styles.navLink}>Reviews</a>
-        </nav>
-        <button onClick={() => navigate("/login")} style={styles.loginBtn}>Portal Login</button>
-      </header>
+<header style={styles.navbar}>
+  <div style={styles.logo}>
+    <img src="/logo.png" alt="StuVio Logo" style={{ height: "40px", width: "auto" }} />
+  </div>
+  <nav style={styles.navLinks}>
+    <a href="#features" style={styles.navLink}>Features</a>
+    <a href="#stats" style={styles.navLink}>Impact</a>
+    <a href="#reviews" style={styles.navLink}>Reviews</a>
+  </nav>
+  <button onClick={() => navigate("/login")} style={styles.loginBtn}>Portal Login</button>
+</header>
 
       {/* HERO SECTION */}
       <section style={styles.heroSection}>
@@ -158,11 +160,11 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto"
   },
-  logo: {
-    fontSize: "24px",
-    fontWeight: "800",
-    color: "#ffffff",
-    letterSpacing: "-1px"
+ logo: {
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer"
+
   },
   navLinks: {
     display: "flex",
