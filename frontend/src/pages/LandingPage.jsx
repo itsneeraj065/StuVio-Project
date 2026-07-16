@@ -27,6 +27,13 @@ function LandingPage() {
 
   return (
     <div style={styles.container}>
+        <nav style={styles.scrollNav}>
+        {["HTML", "CSS", "JavaScript", "Python", "Java", "SQL", "React", "Node.js", "C++"].map((item) => (
+          <span key={item} style={styles.navItem}>
+            {item}
+          </span>
+        ))}
+      </nav>
       
       {/* PUBLIC HEADER NAVBAR */}
 <header style={styles.navbar}>
@@ -385,6 +392,23 @@ socialLink: {
 
 // You might also want to add a hover effect if you wish:
 // (Or just keep it as is, and the icons will match your existing color scheme)
+scrollNav: {
+    display: "flex",
+    overflowX: "auto",      // This enables the scroll
+    whiteSpace: "nowrap",
+    backgroundColor: "#1e293b", // Dark theme to match your app
+    padding: "10px 20px",
+    gap: "20px",
+    scrollbarWidth: "none", // Hides the scrollbar on Firefox
+  },
+  navItem: {
+    color: "#94a3b8",
+    fontSize: "14px",
+    textDecoration: "none",
+    cursor: "pointer",
+    padding: "5px 0",
+    transition: "color 0.2s"
+  }
 };
 
 export default LandingPage;
