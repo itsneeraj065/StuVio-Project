@@ -18,7 +18,6 @@ function LoginPage() {
 
     try {
       await login(email, password);
-      // Success! Move straight into the student portal dashboard
       navigate("/portal/dashboard");
     } catch (err) {
       setError("Unauthorized credentials. Please check your system keys.");
@@ -31,7 +30,13 @@ function LoginPage() {
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={styles.header}>
-          <h2 style={styles.logo} onClick={() => navigate("/")}>StuVio</h2>
+          {/* UPDATED: Replaced h2 with logo image */}
+          <img 
+            src="/logo.png" 
+            alt="StuVio Logo" 
+            onClick={() => navigate("/")} 
+            style={styles.logoImg} 
+          />
           <p style={styles.subtitle}>Enter workspace access credentials</p>
         </div>
 
@@ -76,6 +81,7 @@ function LoginPage() {
 }
 
 const styles = {
+  // ... (keeping your existing container, card, etc., styles)
   container: {
     backgroundColor: "#0b0f19",
     height: "100vh",
@@ -98,12 +104,11 @@ const styles = {
     textAlign: "center",
     marginBottom: "32px"
   },
-  logo: {
-    fontSize: "32px",
-    fontWeight: "800",
-    color: "#ffffff",
+  // UPDATED: Added style for the logo image
+  logoImg: {
+    height: "60px",
+    width: "auto",
     cursor: "pointer",
-    letterSpacing: "-1px",
     marginBottom: "8px"
   },
   subtitle: {
@@ -146,10 +151,7 @@ const styles = {
     padding: "12px 16px",
     fontSize: "14px",
     outline: "none",
-    transition: "border-color 0.2s",
-    "&:focus": {
-      borderColor: "#6366f1"
-    }
+    transition: "border-color 0.2s"
   },
   submitBtn: {
     backgroundColor: "#6366f1",
@@ -169,10 +171,7 @@ const styles = {
     textAlign: "center",
     marginTop: "24px",
     cursor: "pointer",
-    transition: "color 0.2s",
-    "&:hover": {
-      color: "#94a3b8"
-    }
+    transition: "color 0.2s"
   }
 };
 
