@@ -27,26 +27,35 @@ function LandingPage() {
 
   return (
     <div style={styles.container}>
-        <nav style={styles.scrollNav}>
-        {["HTML", "CSS", "JavaScript", "Python", "Java", "SQL", "React", "Node.js", "C++"].map((item) => (
-          <span key={item} style={styles.navItem}>
-            {item}
-          </span>
-        ))}
-      </nav>
+       
       
       {/* PUBLIC HEADER NAVBAR */}
 <header style={styles.navbar}>
   <div style={styles.logo}>
     <img src="/logo.png" alt="StuVio Logo" style={{ height: "80px", width: "auto" }} />
   </div>
+   
   <nav style={styles.navLinks}>
     <a href="#features" style={styles.navLink}>Features</a>
     <a href="#stats" style={styles.navLink}>Impact</a>
     <a href="#reviews" style={styles.navLink}>Reviews</a>
   </nav>
+   
   <button onClick={() => navigate("/login")} style={styles.loginBtn}>Portal Login</button>
+
 </header>
+<nav style={styles.scrollNav}>
+       {["HTML", "CSS", "JavaScript", "Python", "Java", "SQL", "React", "Node.js", "C++"].map((item) => (
+  <span 
+    key={item} 
+    style={styles.navItem}
+    onMouseEnter={(e) => e.target.style.backgroundColor = "#6366f1"} // Your primary color
+    onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+  >
+    {item}
+  </span>
+))}
+      </nav>
 
       {/* HERO SECTION */}
       <section style={styles.heroSection}>
@@ -400,15 +409,21 @@ scrollNav: {
     padding: "10px 20px",
     gap: "20px",
     scrollbarWidth: "none", // Hides the scrollbar on Firefox
+    // ADD THESE LINES TO ADJUST POSITION
+    marginTop: "0px", // Adjust this number (e.g., 20px, 40px) to move it lower
+    marginBottom: "0px", // Adds space between the bar and the content below
+    // Optional: Add a subtle shadow for better visibility
   },
   navItem: {
     color: "#94a3b8",
     fontSize: "14px",
     textDecoration: "none",
     cursor: "pointer",
-    padding: "5px 0",
-    transition: "color 0.2s"
-  }
+    padding: "8px 16px",
+    borderRadius: "6px",        // Rounds the corners of the fill
+    transition: "all 0.2s ease", // Makes the color change smooth  
+    color: "#ffffff"    }        // Text color
+
 };
 
 export default LandingPage;
