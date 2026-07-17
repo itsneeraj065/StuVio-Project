@@ -23,9 +23,10 @@ function Sidebar() {
   return (
     <aside style={styles.sidebar}>
       <div>
-        <div style={styles.logoRow}>
-          <span style={styles.logoText}>StuVio Portal</span>
-        </div>
+        <div style={styles.sidebarLogoContainer}>
+    <img src="/logo.png" alt="StuVio Logo" style={styles.sidebarLogo} />
+    <span style={styles.sidebarTitle}>StuVio</span>
+  </div>
 
         {user && (
           <div style={styles.profileBox}>
@@ -70,15 +71,29 @@ function Sidebar() {
 const styles = {
   sidebar: {
     width: "260px",
-    backgroundColor: "#0d1321",
+    backgroundColor: "#0b0f19",
     borderRight: "1px solid rgba(255, 255, 255, 0.05)",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    padding: "24px 16px",
     height: "100vh",
-    position: "sticky",
-    top: 0
+    padding: "20px"
+  },
+  sidebarLogoContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginBottom: "40px", // Breathing room before the nav links
+    padding: "10px"
+  },
+  sidebarLogo: {
+    height: "32px", // Smaller than the login page logo for a sidebar fit
+    width: "auto"
+  },
+  sidebarTitle: {
+    color: "#ffffff",
+    fontSize: "18px",
+    fontWeight: "700",
+    letterSpacing: "0.5px"
   },
   logoRow: {
     padding: "0 12px 24px 12px",

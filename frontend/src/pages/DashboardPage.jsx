@@ -213,7 +213,7 @@ function DashboardPage() {
       <footer style={styles.footer}>
         <hr style={styles.divider} />
         <div style={styles.footerRow}>
-          <span style={styles.footerText}>© 2026 StuVio. All academic assets managed successfully.</span>
+          <span style={styles.footerText}>© 2026 StuVio. Constructed By Neeraj Singh Baghel.</span>
           <div style={styles.iconContainer}>
   {/* Facebook */}
   <a href="https://facebook.com" target="_blank" rel="noreferrer" className="glow-icon facebook" title="Facebook" style={{ color: "#94a3b8" }}>

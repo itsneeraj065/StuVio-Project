@@ -80,10 +80,68 @@ function LoginPage() {
             <span style={styles.link} onClick={() => navigate("/login")}>Existing User</span>
           </div>
         </div>
-
-        <p style={styles.backHome} onClick={() => navigate("/")}>
+       <p style={styles.backHome} onClick={() => navigate("/")}>
           ← Back to Public System Interface
         </p>
+           {/* Social Media Login Icons */}
+<div style={styles.socialContainer}>
+<div 
+    style={styles.socialIcon} 
+    onClick={() => console.log("Google Login")}
+    onMouseEnter={(e) => {
+      // Primary glow color (e.g., #6366f1)
+      e.target.style.boxShadow = "0 0 15px rgba(99, 102, 241, 0.6)";
+      e.target.style.borderColor = "rgba(99, 102, 241, 0.4)";
+      e.target.style.color = "#ffffff";
+    }}
+    onMouseLeave={(e) => {
+      // Normal state (clear glow)
+      e.target.style.boxShadow = "none";
+      e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
+      e.target.style.color = "#94a3b8";
+    }}
+  >
+    Google
+  </div> 
+<div 
+    style={styles.socialIcon} 
+    onClick={() => console.log("LinkedIn Login")}
+    onMouseEnter={(e) => {
+      // Primary glow color (e.g., #6366f1)
+      e.target.style.boxShadow = "0 0 15px rgba(99, 102, 241, 0.6)";
+      e.target.style.borderColor = "rgba(99, 102, 241, 0.4)";
+      e.target.style.color = "#ffffff";
+    }}
+    onMouseLeave={(e) => {
+      // Normal state (clear glow)
+      e.target.style.boxShadow = "none";
+      e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
+      e.target.style.color = "#94a3b8";
+    }}
+  >
+    LinkedIn
+  </div> 
+<div 
+    style={styles.socialIcon} 
+    onClick={() => console.log("GitHub Login")}
+    onMouseEnter={(e) => {
+      // Primary glow color (e.g., #6366f1)
+      e.target.style.boxShadow = "0 0 15px rgba(99, 102, 241, 0.6)";
+      e.target.style.borderColor = "rgba(99, 102, 241, 0.4)";
+      e.target.style.color = "#ffffff";
+    }}
+    onMouseLeave={(e) => {
+      // Normal state (clear glow)
+      e.target.style.boxShadow = "none";
+      e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
+      e.target.style.color = "#94a3b8";
+    }}
+  >
+    GitHub
+  </div> 
+  </div>
+  
+  
       </div>
 
       <footer style={styles.footer}>
@@ -156,7 +214,30 @@ const styles = {
   label: { fontSize: "12px", fontWeight: "600", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px" },
   input: { backgroundColor: "rgba(15, 23, 42, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", color: "#ffffff", padding: "12px 16px", fontSize: "14px", outline: "none" },
   submitBtn: { backgroundColor: "#6366f1", color: "#ffffff", border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: "600", cursor: "pointer", marginTop: "10px" },
-  backHome: { fontSize: "13px", color: "#64748b", textAlign: "center", marginTop: "24px", cursor: "pointer" }
+  backHome: { fontSize: "13px", color: "#64748b", textAlign: "center", marginTop: "24px", cursor: "pointer" } ,
+  socialContainer: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "20px",
+    marginTop: "30px",
+    paddingTop: "20px",
+    borderTop: "1px solid rgba(255, 255, 255, 0.05)"
+  },
+  socialIcon: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    backgroundColor: "rgba(30, 41, 59, 0.5)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#94a3b8",
+    fontSize: "12px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "all 0.2s"
+  }
 };
 
 export default LoginPage;
