@@ -27,34 +27,33 @@ function LandingPage() {
 
   return (
     <div style={styles.container}>
-       
       
       {/* PUBLIC HEADER NAVBAR */}
-<header style={styles.navbar}>
-  <div style={styles.logo}>
-    <img src="/logo.png" alt="StuVio Logo" style={{ height: "80px", width: "auto" }} />
-  </div>
-   
-  <nav style={styles.navLinks}>
-    <a href="#features" style={styles.navLink}>Features</a>
-    <a href="#stats" style={styles.navLink}>Impact</a>
-    <a href="#reviews" style={styles.navLink}>Reviews</a>
-  </nav>
-   
-  <button onClick={() => navigate("/login")} style={styles.loginBtn}>Portal Login</button>
+      <header style={styles.navbar}>
+        <div style={styles.logo}>
+          <img src="/logo.png" alt="StuVio Logo" style={{ height: "80px", width: "auto" }} />
+        </div>
+        
+        <nav style={styles.navLinks}>
+          <a href="#features" style={styles.navLink}>Features</a>
+          <a href="#stats" style={styles.navLink}>Impact</a>
+          <a href="#reviews" style={styles.navLink}>Reviews</a>
+        </nav>
+        
+        <button onClick={() => navigate("/login")} style={styles.loginBtn}>Portal Login</button>
+      </header>
 
-</header>
-<nav style={styles.scrollNav}>
-       {["HTML", "CSS", "JavaScript", "Python", "Java", "SQL", "React", "Node.js", "C++"].map((item) => (
-  <span 
-    key={item} 
-    style={styles.navItem}
-    onMouseEnter={(e) => e.target.style.backgroundColor = "#6366f1"} // Your primary color
-    onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
-  >
-    {item}
-  </span>
-))}
+      <nav style={styles.scrollNav}>
+        {["HTML", "CSS", "JavaScript", "Python", "Java", "SQL", "React", "Node.js", "C++"].map((item) => (
+          <span 
+            key={item} 
+            style={styles.navItem}
+            onMouseEnter={(e) => e.target.style.backgroundColor = "#6366f1"}
+            onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+          >
+            {item}
+          </span>
+        ))}
       </nav>
 
       {/* HERO SECTION */}
@@ -131,31 +130,28 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-<footer style={styles.footer}>
-  <div style={styles.footerRow}>
-    {/* Left side stays as requested */}
-    <div>© {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.</div>
-    
-    {/* Right side now includes both Links and Social Icons */}
-    <div style={styles.footerLinks}>
-      <a href="#features" style={styles.footerLink}>Features</a>
-      
-      {/* SOCIAL MEDIA ICONS */}
-      <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-        <a href="https://github.com/your-profile" target="_blank" rel="noreferrer" style={styles.socialLink}>
-          <FaGithub />
-        </a>
-        <a href="https://linkedin.com/in/your-profile" target="_blank" rel="noreferrer" style={styles.socialLink}>
-          <FaLinkedin />
-        </a>
-        <a href="https://instagram.com/your-handle" target="_blank" rel="noreferrer" style={styles.socialLink}>
-          <FaInstagram />
-        </a>
-      </div>
-    </div>
-  </div>
-</footer>
+      {/* FOOTER (PERMANENTLY LOCKED AT BOTTOM) */}
+      <footer style={styles.footer}>
+        <div style={styles.footerRow}>
+          <div>© {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.</div>
+          
+          <div style={styles.footerLinks}>
+            <a href="#features" style={styles.footerLink}>Features</a>
+            
+            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+              <a href="https://github.com/your-profile" target="_blank" rel="noreferrer" style={styles.socialLink}>
+                <FaGithub />
+              </a>
+              <a href="https://linkedin.com/in/your-profile" target="_blank" rel="noreferrer" style={styles.socialLink}>
+                <FaLinkedin />
+              </a>
+              <a href="https://instagram.com/your-handle" target="_blank" rel="noreferrer" style={styles.socialLink}>
+                <FaInstagram />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
@@ -165,10 +161,12 @@ const styles = {
   container: {
     backgroundColor: "#0b0f19",
     color: "#cbd5e1",
-    minHeight: "100vh"
+    minHeight: "100vh",
+    paddingBottom: "80px" // Adds spacing at bottom so page content isn't blocked by fixed footer
   },
   navbar: {
     display: "flex",
+    justifyInContent: "space-between",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "20px 40px",
@@ -176,11 +174,10 @@ const styles = {
     maxWidth: "1200px",
     margin: "0 auto"
   },
- logo: {
+  logo: {
     display: "flex",
     alignItems: "center",
     cursor: "pointer"
-
   },
   navLinks: {
     display: "flex",
@@ -367,8 +364,14 @@ const styles = {
     letterSpacing: "-0.5px"
   },
   footer: {
-    borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-    padding: "30px 40px"
+    position: "fixed",      // Locks footer to the viewport
+    bottom: 0,              // Pins to screen bottom
+    left: 0,
+    right: 0,
+    zIndex: 1000,           // Keeps footer above other components
+    backgroundColor: "#0b0f19",
+    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+    padding: "18px 40px"
   },
   footerRow: {
     display: "flex",
@@ -383,47 +386,41 @@ const styles = {
   },
   footerLinks: {
     display: "flex",
-    gap: "24px"
+    gap: "24px",
+    alignItems: "center"
   },
   footerLink: {
     color: "#64748b",
     textDecoration: "none",
     transition: "color 0.2s"
-  } , 
-  // Add this inside your styles object:
-socialLink: {
+  },
+  socialLink: {
     color: "#64748b",
     fontSize: "18px",
     display: "flex",
     alignItems: "center",
     transition: "color 0.2s"
   },
-
-// You might also want to add a hover effect if you wish:
-// (Or just keep it as is, and the icons will match your existing color scheme)
-scrollNav: {
+  scrollNav: {
     display: "flex",
-    overflowX: "auto",      // This enables the scroll
+    overflowX: "auto",
     whiteSpace: "nowrap",
-    backgroundColor: "#1e293b", // Dark theme to match your app
+    backgroundColor: "#1e293b",
     padding: "10px 20px",
     gap: "20px",
-    scrollbarWidth: "none", // Hides the scrollbar on Firefox
-    // ADD THESE LINES TO ADJUST POSITION
-    marginTop: "0px", // Adjust this number (e.g., 20px, 40px) to move it lower
-    marginBottom: "0px", // Adds space between the bar and the content below
-    // Optional: Add a subtle shadow for better visibility
+    scrollbarWidth: "none",
+    marginTop: "0px",
+    marginBottom: "0px"
   },
   navItem: {
-    color: "#94a3b8",
     fontSize: "14px",
     textDecoration: "none",
     cursor: "pointer",
     padding: "8px 16px",
-    borderRadius: "6px",        // Rounds the corners of the fill
-    transition: "all 0.2s ease", // Makes the color change smooth  
-    color: "#ffffff"    }        // Text color
-
+    borderRadius: "6px",
+    transition: "all 0.2s ease",
+    color: "#ffffff"
+  }
 };
 
 export default LandingPage;
