@@ -6,6 +6,9 @@ import Sidebar from "./components/Sidebar";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
+import LearnPage from './pages/LearnPage';
+import PracticePage from './pages/PracticePage';
+import QuizPage from './pages/QuizPage';
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import MyCoursesPage from "./pages/MyCoursesPage";
@@ -38,6 +41,9 @@ function App() {
       <Routes>
         {/* Public Landing & Login Pages */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/learn/:language" element={<LearnPage />} />
+        <Route path="/practice/:language" element={<PracticePage />} />
+        <Route path="/quiz/:language" element={<QuizPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Protected Student Portal Section (Note the "/*" wildcard added here) */}
