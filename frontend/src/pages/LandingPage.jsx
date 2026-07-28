@@ -1,8 +1,23 @@
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 
 function LandingPage() {
   const navigate = useNavigate();
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const scrollNavRef = useRef(null);
+
+  const navCategories = [
+    { name: "HTML", slug: "html" },
+    { name: "CSS", slug: "css" },
+    { name: "JavaScript", slug: "javascript" },
+    { name: "Python", slug: "python" },
+    { name: "Java", slug: "java" },
+    { name: "SQL", slug: "sql" },
+    { name: "React", slug: "react" },
+    { name: "Node.js", slug: "nodejs" },
+    { name: "C++", slug: "cpp" }
+  ];
 
   const features = [
     { icon: "📚", title: "Courses Hub", desc: "Access comprehensive syllabus trackers and class lists." },
@@ -25,6 +40,22 @@ function LandingPage() {
     { stars: "★★★★★", text: "No more messy group chats or lost PDFs. Having video lectures, notes, and deadlines in one dashboard is awesome.", author: "Priya Sharma, ECE" }
   ];
 
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (scrollNavRef.current && !scrollNavRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSubCategoryClick = (type, slug) => {
+    setOpenDropdown(null);
+    navigate(`/${type}/${slug}`); // Navigates to /learn/html or /practice/html
+  };
+
   return (
     <div style={styles.container}>
       
@@ -43,16 +74,49 @@ function LandingPage() {
         <button onClick={() => navigate("/login")} style={styles.loginBtn}>Portal Login</button>
       </header>
 
-      <nav style={styles.scrollNav}>
-        {["HTML", "CSS", "JavaScript", "Python", "Java", "SQL", "React", "Node.js", "C++"].map((item) => (
-          <span 
-            key={item} 
-            style={styles.navItem}
-            onMouseEnter={(e) => e.target.style.backgroundColor = "#6366f1"}
-            onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+      {/* SCROLLING CATEGORY NAV WITH DROPDOWNS */}
+      <nav style={styles.scrollNav} ref={scrollNavRef}>
+        {navCategories.map((item) => (
+          <div 
+            key={item.slug} 
+            style={styles.dropdownContainer}
+            onMouseEnter={() => setOpenDropdown(item.slug)}
+            onMouseLeave={() => setOpenDropdown(null)}
           >
-            {item}
-          </span>
+            <span 
+              style={{
+                ...styles.navItem,
+                backgroundColor: openDropdown === item.slug ? "#6366f1" : "transparent"
+              }}
+              onClick={() => setOpenDropdown(openDropdown === item.slug ? null : item.slug)}
+            >
+              {item.name} ▾
+            </span>
+
+            {/* DROPDOWN MENU */}
+            {openDropdown === item.slug && (
+              <div style={styles.dropdownMenu}>
+                <div 
+                  style={styles.dropdownItem}
+                  onClick={() => handleSubCategoryClick("learn", item.slug)}
+                >
+                  📖 Learn {item.name}
+                </div>
+                <div 
+                  style={styles.dropdownItem}
+                  onClick={() => handleSubCategoryClick("practice", item.slug)}
+                >
+                  💻 Practice {item.name}
+                </div>
+                <div 
+                  style={styles.dropdownItem}
+                  onClick={() => handleSubCategoryClick("quiz", item.slug)}
+                >
+                  ✏️ {item.name} Quiz
+                </div>
+              </div>
+            )}
+          </div>
         ))}
       </nav>
 
@@ -130,7 +194,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* FOOTER (PERMANENTLY LOCKED AT BOTTOM) */}
+      {/* FOOTER (LOCKED AT BOTTOM) */}
       <footer style={styles.footer}>
         <div style={styles.footerRow}>
           <div>© {new Date().getFullYear()} StuVio. Constructed by Neeraj Singh Baghel.</div>
@@ -162,11 +226,10 @@ const styles = {
     backgroundColor: "#0b0f19",
     color: "#cbd5e1",
     minHeight: "100vh",
-    paddingBottom: "80px" // Adds spacing at bottom so page content isn't blocked by fixed footer
+    paddingBottom: "80px"
   },
   navbar: {
     display: "flex",
-    justifyInContent: "space-between",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "20px 40px",
@@ -200,6 +263,52 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     transition: "background 0.2s"
+  },
+  scrollNav: {
+    display: "flex",
+    overflowX: "visible", // Allows dropdowns to pop out properly
+    overflowY: "visible",
+    backgroundColor: "#1e293b",
+    padding: "10px 20px",
+    gap: "12px",
+    position: "relative",
+    zIndex: 100
+  },
+  dropdownContainer: {
+    position: "relative",
+    display: "inline-block"
+  },
+  navItem: {
+    fontSize: "14px",
+    textDecoration: "none",
+    cursor: "pointer",
+    padding: "8px 16px",
+    borderRadius: "6px",
+    transition: "all 0.2s ease",
+    color: "#ffffff",
+    display: "inline-block",
+    userSelect: "none"
+  },
+  dropdownMenu: {
+    position: "absolute",
+    top: "100%",
+    left: "0",
+    backgroundColor: "#1e293b",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "8px",
+    boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.4)",
+    padding: "8px 0",
+    minWidth: "160px",
+    zIndex: 1000,
+    marginTop: "4px"
+  },
+  dropdownItem: {
+    padding: "10px 16px",
+    fontSize: "13px",
+    color: "#cbd5e1",
+    cursor: "pointer",
+    transition: "background 0.2s",
+    whiteSpace: "nowrap"
   },
   heroSection: {
     padding: "100px 20px",
@@ -364,11 +473,11 @@ const styles = {
     letterSpacing: "-0.5px"
   },
   footer: {
-    position: "fixed",      // Locks footer to the viewport
-    bottom: 0,              // Pins to screen bottom
+    position: "fixed",
+    bottom: 0,
     left: 0,
     right: 0,
-    zIndex: 1000,           // Keeps footer above other components
+    zIndex: 1000,
     backgroundColor: "#0b0f19",
     borderTop: "1px solid rgba(255, 255, 255, 0.1)",
     padding: "18px 40px"
@@ -400,27 +509,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     transition: "color 0.2s"
-  },
-  scrollNav: {
-    display: "flex",
-    overflowX: "auto",
-    whiteSpace: "nowrap",
-    backgroundColor: "#1e293b",
-    padding: "10px 20px",
-    gap: "20px",
-    scrollbarWidth: "none",
-    marginTop: "0px",
-    marginBottom: "0px"
-  },
-  navItem: {
-    fontSize: "14px",
-    textDecoration: "none",
-    cursor: "pointer",
-    padding: "8px 16px",
-    borderRadius: "6px",
-    transition: "all 0.2s ease",
-    color: "#ffffff"
   }
 };
 
-export default LandingPage;
+export default LandingPage:
