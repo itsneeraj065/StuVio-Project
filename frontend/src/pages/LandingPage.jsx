@@ -512,4 +512,4 @@ const styles = {
   }
 };
 
-export default LandingPage:
+export default LandingPage;
